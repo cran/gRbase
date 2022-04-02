@@ -152,6 +152,26 @@ namespace gRbase {
         return Rcpp::as<NumericVector >(rcpp_result_gen);
     }
 
+    inline void next_cell2_(IntegerVector& cell, const IntegerVector& dim) {
+        typedef SEXP(*Ptr_next_cell2_)(SEXP,SEXP);
+        static Ptr_next_cell2_ p_next_cell2_ = NULL;
+        if (p_next_cell2_ == NULL) {
+            validateSignature("void(*next_cell2_)(IntegerVector&,const IntegerVector&)");
+            p_next_cell2_ = (Ptr_next_cell2_)R_GetCCallable("gRbase", "_gRbase_next_cell2_");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_next_cell2_(Shield<SEXP>(Rcpp::wrap(cell)), Shield<SEXP>(Rcpp::wrap(dim)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+    }
+
     inline NumericVector next_cell_slice_(const NumericVector& cell, const IntegerVector& dim, const IntegerVector& slice_marg) {
         typedef SEXP(*Ptr_next_cell_slice_)(SEXP,SEXP,SEXP);
         static Ptr_next_cell_slice_ p_next_cell_slice_ = NULL;
@@ -297,6 +317,27 @@ namespace gRbase {
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<SEXP >(rcpp_result_gen);
+    }
+
+    inline numVec tab_marg2_(const numVec tab1, const intVec marg) {
+        typedef SEXP(*Ptr_tab_marg2_)(SEXP,SEXP);
+        static Ptr_tab_marg2_ p_tab_marg2_ = NULL;
+        if (p_tab_marg2_ == NULL) {
+            validateSignature("numVec(*tab_marg2_)(const numVec,const intVec)");
+            p_tab_marg2_ = (Ptr_tab_marg2_)R_GetCCallable("gRbase", "_gRbase_tab_marg2_");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_tab_marg2_(Shield<SEXP>(Rcpp::wrap(tab1)), Shield<SEXP>(Rcpp::wrap(marg)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<numVec >(rcpp_result_gen);
     }
 
     inline SEXP tab_marg_(const SEXP& tab, const SEXP& marg) {
@@ -1053,6 +1094,26 @@ namespace gRbase {
         if (rcpp_result_gen.inherits("try-error"))
             throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
         return Rcpp::as<IntegerMatrix >(rcpp_result_gen);
+    }
+
+    inline void next_perm_(IntegerVector& vv) {
+        typedef SEXP(*Ptr_next_perm_)(SEXP);
+        static Ptr_next_perm_ p_next_perm_ = NULL;
+        if (p_next_perm_ == NULL) {
+            validateSignature("void(*next_perm_)(IntegerVector&)");
+            p_next_perm_ = (Ptr_next_perm_)R_GetCCallable("gRbase", "_gRbase_next_perm_");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_next_perm_(Shield<SEXP>(Rcpp::wrap(vv)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
     }
 
 }

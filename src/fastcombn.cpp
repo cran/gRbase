@@ -17,6 +17,22 @@ typedef Rcpp::IntegerMatrix   intMat;
 #include <iostream>
 #include <string>
 
+// Taken from: https://stackoverflow.com/questions/9330915/number-of-combinations-n-choose-r-in-c
+
+unsigned nChoosek_( unsigned n, unsigned k )
+{
+    if (k > n) return 0;
+    if (k * 2 > n) k = n-k;
+    if (k == 0) return 1;
+
+    int result = n;
+    for( int i = 2; i <= k; ++i ) {
+        result *= (n-i+1);
+        result /= i;
+    }
+    return result;
+}
+
 
 //[[Rcpp::export]]
 int choose_(int N, int K){
@@ -41,7 +57,7 @@ IntegerMatrix do_combn(int N, int K){
   
   do {
     rr = 0;
-    for (int i = 0, idx = 0; i < N; ++i) // [0..N-1] integers
+    for (int i = 0; i < N; ++i) // [0..N-1] integers
       {
 	if (bitmask[i]) {
 	  out(rr++, cc) = i + 1; // or i + 1
@@ -51,6 +67,37 @@ IntegerMatrix do_combn(int N, int K){
   } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
   return out;
 }
+
+
+//[[Rcpp::export]]
+void next_perm_(IntegerVector& vv){
+  int n=vv.length(), ii, jj, ss;
+
+  for (ii=n-1; ii>1; ii--){
+    if (vv[ii]==0 && vv[ii-1]==1) break;
+  }
+
+  if (ii <= n){
+    vv[ii-1] = 0;
+    vv[ii]   = 1;
+    if (ii < n){
+      ss = 0;
+      for (jj = ii; jj < n; jj++) ss += vv[jj];
+      if (ss > 0){
+	for (jj = ii;    jj < ii+ss; jj++) vv[jj] = 1;	
+	for (jj = ii+ss; jj < n;     jj++) vv[jj] = 0;
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
 
 
 // template <int RTYPE>

@@ -11,15 +11,15 @@
 \title{Simulated data from the Chest Clinic example}
 \format{
 A data frame with 500 observations on the following 8 variables.
-  \describe{
-  \item{\code{asia}}{a factor with levels \code{yes} \code{no}}
-  \item{\code{tub}}{a factor with levels \code{yes} \code{no}}
-  \item{\code{smoke}}{a factor with levels \code{yes} \code{no}}
-  \item{\code{lung}}{a factor with levels \code{yes} \code{no}}
-  \item{\code{bronc}}{a factor with levels \code{yes} \code{no}}
-  \item{\code{either}}{a factor with levels \code{yes} \code{no}}
-  \item{\code{xray}}{a factor with levels \code{yes} \code{no}}
-  \item{\code{dysp}}{a factor with levels \code{yes} \code{no}}
+\describe{
+\item{\code{asia}}{Recent visit to Asia?; a factor with levels \code{yes} \code{no}}
+\item{\code{tub}}{Has tuberculosis?; a factor with levels \code{yes} \code{no}}
+\item{\code{smoke}}{Is a smoker?; a factor with levels \code{yes} \code{no}}
+\item{\code{lung}}{Has lung cancer?; a factor with levels \code{yes} \code{no}}
+\item{\code{bronc}}{Has bronchitis?; a factor with levels \code{yes} \code{no}}
+\item{\code{either}}{Either lung cancer or tuberculosis?; a factor with levels \code{yes} \code{no}}
+\item{\code{xray}}{Positive x-ray? a factor with levels \code{yes} \code{no}}
+\item{\code{dysp}}{Dyspnoea (shortness of breath)?; a factor with levels \code{yes} \code{no}}
 }
 }
 \usage{
@@ -27,7 +27,11 @@ data(chestSim500)
 }
 \description{
 Simulated data from the Chest Clinic example (also known as the Asia
-example) from Lauritzen and Spiegelhalter, 1988.
+example) from Lauritzen and Spiegelhalter, 1988 (see reference below).
+}
+\details{
+Notice that the chest clinic example is a contrieved
+example; it does not originate from an empirical study.
 }
 \examples{
 
@@ -37,8 +41,8 @@ data(chestSim500)
 }
 \references{
 Lauritzen and Spiegelhalter (1988) Local Computations
-    with Probabilities on Graphical Structures and their
-    Application to Expert Systems (with
-    Discussion). J. Roy. Stat. Soc. 50, p. 157-224.
+with Probabilities on Graphical Structures and their
+Application to Expert Systems (with
+Discussion). J. Roy. Stat. Soc. 50, p. 157-224.
 }
 \keyword{datasets}

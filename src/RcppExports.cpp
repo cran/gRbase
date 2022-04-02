@@ -10,6 +10,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // order2_
 IntegerVector order2_(SEXP x, bool desc);
 RcppExport SEXP _gRbase_order2_(SEXP xSEXP, SEXP descSEXP) {
@@ -301,6 +306,40 @@ RcppExport SEXP _gRbase_next_cell_(SEXP cellSEXP, SEXP dimSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// next_cell2_
+void next_cell2_(IntegerVector& cell, const IntegerVector& dim);
+static SEXP _gRbase_next_cell2__try(SEXP cellSEXP, SEXP dimSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< IntegerVector& >::type cell(cellSEXP);
+    Rcpp::traits::input_parameter< const IntegerVector& >::type dim(dimSEXP);
+    next_cell2_(cell, dim);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _gRbase_next_cell2_(SEXP cellSEXP, SEXP dimSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_gRbase_next_cell2__try(cellSEXP, dimSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // next_cell_slice_
 NumericVector next_cell_slice_(const NumericVector& cell, const IntegerVector& dim, const IntegerVector& slice_marg);
 static SEXP _gRbase_next_cell_slice__try(SEXP cellSEXP, SEXP dimSEXP, SEXP slice_margSEXP) {
@@ -531,6 +570,41 @@ RcppExport SEXP _gRbase_tab_align_(SEXP tab1SEXP, SEXP tab2SEXP) {
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
         rcpp_result_gen = PROTECT(_gRbase_tab_align__try(tab1SEXP, tab2SEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// tab_marg2_
+numVec tab_marg2_(const numVec tab1, const intVec marg);
+static SEXP _gRbase_tab_marg2__try(SEXP tab1SEXP, SEXP margSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const numVec >::type tab1(tab1SEXP);
+    Rcpp::traits::input_parameter< const intVec >::type marg(margSEXP);
+    rcpp_result_gen = Rcpp::wrap(tab_marg2_(tab1, marg));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _gRbase_tab_marg2_(SEXP tab1SEXP, SEXP margSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_gRbase_tab_marg2__try(tab1SEXP, margSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -1972,6 +2046,39 @@ RcppExport SEXP _gRbase_do_combn(SEXP NSEXP, SEXP KSEXP) {
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// next_perm_
+void next_perm_(IntegerVector& vv);
+static SEXP _gRbase_next_perm__try(SEXP vvSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< IntegerVector& >::type vv(vvSEXP);
+    next_perm_(vv);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _gRbase_next_perm_(SEXP vvSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_gRbase_next_perm__try(vvSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // solveSPD
 SEXP solveSPD(arma::mat X);
 RcppExport SEXP _gRbase_solveSPD(SEXP XSEXP) {
@@ -1994,6 +2101,7 @@ static int _gRbase_RcppExport_validate(const char* sig) {
         signatures.insert("IntegerVector(*make_plevels_)(const IntegerVector&)");
         signatures.insert("IntegerVector(*entry2cell_)(const int&,const IntegerVector&)");
         signatures.insert("NumericVector(*next_cell_)(const NumericVector&,const IntegerVector&)");
+        signatures.insert("void(*next_cell2_)(IntegerVector&,const IntegerVector&)");
         signatures.insert("NumericVector(*next_cell_slice_)(const NumericVector&,const IntegerVector&,const IntegerVector&)");
         signatures.insert("IntegerVector(*slice2entry_)(const IntegerVector&,const IntegerVector&,const IntegerVector&)");
         signatures.insert("int(*cell2entry_perm_)(const NumericVector&,const IntegerVector&,const IntegerVector&)");
@@ -2001,6 +2109,7 @@ static int _gRbase_RcppExport_validate(const char* sig) {
         signatures.insert("SEXP(*tab_perm_)(const SEXP&,const SEXP&)");
         signatures.insert("SEXP(*tab_expand_)(const SEXP&,const SEXP&,const int&)");
         signatures.insert("SEXP(*tab_align_)(const SEXP&,const SEXP&)");
+        signatures.insert("numVec(*tab_marg2_)(const numVec,const intVec)");
         signatures.insert("SEXP(*tab_marg_)(const SEXP&,const SEXP&)");
         signatures.insert("NumericVector(*tab_op_)(const NumericVector&,const NumericVector&,const char)");
         signatures.insert("NumericVector(*tab_add_)(const NumericVector&,const NumericVector&)");
@@ -2037,6 +2146,7 @@ static int _gRbase_RcppExport_validate(const char* sig) {
         signatures.insert("SEXP(*isin_)(List,SEXP,bool)");
         signatures.insert("int(*choose_)(int,int)");
         signatures.insert("IntegerMatrix(*do_combn)(int,int)");
+        signatures.insert("void(*next_perm_)(IntegerVector&)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -2049,6 +2159,7 @@ RcppExport SEXP _gRbase_RcppExport_registerCCallable() {
     R_RegisterCCallable("gRbase", "_gRbase_make_plevels_", (DL_FUNC)_gRbase_make_plevels__try);
     R_RegisterCCallable("gRbase", "_gRbase_entry2cell_", (DL_FUNC)_gRbase_entry2cell__try);
     R_RegisterCCallable("gRbase", "_gRbase_next_cell_", (DL_FUNC)_gRbase_next_cell__try);
+    R_RegisterCCallable("gRbase", "_gRbase_next_cell2_", (DL_FUNC)_gRbase_next_cell2__try);
     R_RegisterCCallable("gRbase", "_gRbase_next_cell_slice_", (DL_FUNC)_gRbase_next_cell_slice__try);
     R_RegisterCCallable("gRbase", "_gRbase_slice2entry_", (DL_FUNC)_gRbase_slice2entry__try);
     R_RegisterCCallable("gRbase", "_gRbase_cell2entry_perm_", (DL_FUNC)_gRbase_cell2entry_perm__try);
@@ -2056,6 +2167,7 @@ RcppExport SEXP _gRbase_RcppExport_registerCCallable() {
     R_RegisterCCallable("gRbase", "_gRbase_tab_perm_", (DL_FUNC)_gRbase_tab_perm__try);
     R_RegisterCCallable("gRbase", "_gRbase_tab_expand_", (DL_FUNC)_gRbase_tab_expand__try);
     R_RegisterCCallable("gRbase", "_gRbase_tab_align_", (DL_FUNC)_gRbase_tab_align__try);
+    R_RegisterCCallable("gRbase", "_gRbase_tab_marg2_", (DL_FUNC)_gRbase_tab_marg2__try);
     R_RegisterCCallable("gRbase", "_gRbase_tab_marg_", (DL_FUNC)_gRbase_tab_marg__try);
     R_RegisterCCallable("gRbase", "_gRbase_tab_op_", (DL_FUNC)_gRbase_tab_op__try);
     R_RegisterCCallable("gRbase", "_gRbase_tab_add_", (DL_FUNC)_gRbase_tab_add__try);
@@ -2092,6 +2204,7 @@ RcppExport SEXP _gRbase_RcppExport_registerCCallable() {
     R_RegisterCCallable("gRbase", "_gRbase_isin_", (DL_FUNC)_gRbase_isin__try);
     R_RegisterCCallable("gRbase", "_gRbase_choose_", (DL_FUNC)_gRbase_choose__try);
     R_RegisterCCallable("gRbase", "_gRbase_do_combn", (DL_FUNC)_gRbase_do_combn_try);
+    R_RegisterCCallable("gRbase", "_gRbase_next_perm_", (DL_FUNC)_gRbase_next_perm__try);
     R_RegisterCCallable("gRbase", "_gRbase_RcppExport_validate", (DL_FUNC)_gRbase_RcppExport_validate);
     return R_NilValue;
 }

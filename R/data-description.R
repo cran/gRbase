@@ -81,7 +81,7 @@
 #' Physiological Principles of the Conditioning Process_, Allyn and
 #' Bacon, Inc., Boston.
 #' @source For more information see
-#'     http://lib.stat.cmu.edu/datasets/bodyfat
+#'     https://lib.stat.cmu.edu/datasets/bodyfat
 #' @keywords datasets
 #' @usage data(BodyFat)
 #' 
@@ -134,47 +134,79 @@
 
 #' Coronary artery disease data
 #' 
-#' A cross classified table with observational data from a Danish heart clinic.
-#' The response variable is CAD.
+#' A cross classified table with observational data from a Danish
+#' heart clinic.  The response variable is CAD (coronary artery
+#' disease, some times called heart attack).
 #'
 #' @details
 #'
+#' Notice that data are collected at a heart clinic, so data do not
+#' represent the population, but are conditional on patients having
+#' ended up at the clinic.
+#' 
 #' * cad1: Complete dataset, 236 cases.
 #'
 #' * cad2: Incomplete dataset, 67 cases. Information on (some of) the
-#'     variables Hyperchol, Smoker, Inherit is missing.
+#'     variables 'Hyperchol', 'Smoker' and 'Inherit' is missing.
 #' 
 #' @name data-cad
 #' @aliases cad1 cad2
 #' @docType data
 #' @format A data frame with 236 observations on the following 14 variables.
 #'
-#'   \describe{
-#'   \item{\code{Sex}}{a factor with levels \code{Female} \code{Male}}
-#'   \item{\code{AngPec}}{a factor with levels \code{Atypical} \code{None} \code{Typical}}
-#'   \item{\code{AMI}}{a factor with levels \code{Definite} \code{NotCertain}}
-#'   \item{\code{QWave}}{a factor with levels \code{No} \code{Yes}}
-#'   \item{\code{QWavecode}}{a factor with levels \code{Nonusable} \code{Usable}}
-#'   \item{\code{STcode}}{a factor with levels \code{Nonusable} \code{Usable}}
-#'   \item{\code{STchange}}{a factor with levels \code{No} \code{Yes}}
-#'   \item{\code{SuffHeartF}}{a factor with levels \code{No} \code{Yes}}
-#'   \item{\code{Hypertrophi}}{a factor with levels \code{No} \code{Yes}}
-#'   \item{\code{Hyperchol}}{a factor with levels \code{No} \code{Yes}}
-#'   \item{\code{Smoker}}{a factor with levels \code{No} \code{Yes}}
-#'   \item{\code{Inherit}}{a factor with levels \code{No} \code{Yes}}
-#'   \item{\code{Heartfail}}{a factor with levels \code{No} \code{Yes}}
-#'   \item{\code{CAD}}{a factor with levels \code{No} \code{Yes}}
+#' \describe{
+#'   \item{\code{Sex}}{Sex; a factor with levels \code{Female} \code{Male}}
+#'
+#'   \item{\code{AngPec}}{Angina pectoris (chest pain attacks); a
+#'   factor with levels \code{Atypical} \code{None} \code{Typical}}
+#'
+#'   \item{\code{AMI}}{Acute myocardic infarct; a factor with
+#'   levels \code{Definite} \code{NotCertain}}
+#'
+#'   \item{\code{QWave}}{A reading from an electrocardiogram; a
+#'   factor with levels \code{No} \code{Yes}; Yes means pathological and is a sign of previous myocardial infarction. }
+#'
+#'   \item{\code{QWavecode}}{a factor with levels \code{Nonusable}
+#'   \code{Usable}. An assesment of whether QWave is reliable.}
+#'
+#'   \item{\code{STcode}}{a factor with levels
+#'   \code{Nonusable} \code{Usable}. An assesment of whether STchange is reliable.}
+#'
+#'   \item{\code{STchange}}{A reading from an electrocardiogram; a factor
+#'   with levels \code{No} \code{Yes}. An STchange indicates a blockage of the coronary artery.}
+#'
+#'   \item{\code{SuffHeartF}}{Sufficient heart frequency; a factor with levels \code{No}, \code{Yes}}
+#' 
+#'   \item{\code{Hypertrophi}}{a factor with levels \code{No}, \code{Yes}. Hypertrophy refers to an
+#'   increased size of the heart muscle due to exercise. }
+#'
+#'   \item{\code{Hyperchol}}{a factor with levels \code{No} \code{Yes}. Hypercholesterolemia, also called high cholesterol,
+#'    is the presence of high levels of cholesterol in the blood.}
+#'
+#'   \item{\code{Smoker}}{Is the patient a smoker; a factor with levels \code{No}, \code{Yes}.}
+#'
+#'   \item{\code{Inherit}}{Hereditary predispositions for CAD; a factor with levels  \code{No}, \code{Yes}.}
+#'
+#'   \item{\code{Heartfail}}{Previous heart failures; a factor with  levels \code{No} \code{Yes}}
+#'
+#'   \item{\code{CAD}}{Coronary Artery Disease; a factor with levels
+#'    \code{No} \code{Yes}}.  CAD refers to a reduction of blood flow
+#'    to the heart muscle (commonly known as a heart attack). The
+#'    diagnosis made from biopsies.
+#'
 #' }
 #'
 #' 
-#' @references Højsgaard, Søren and Thiesson, Bo (1995). BIFROST - Block
+#' @references Hansen, J. F. (1980). The clinical diagnoisis of ichaeme heart disease du to
+#' coronary artery disease. Danish Medical Bulletin
+#'
+#' Højsgaard, Søren and Thiesson, Bo (1995). BIFROST - Block
 #' recursive models Induced From Relevant knowledge, Observations and
 #' Statistical Techniques. Computational Statistics and Data Analysis, vol. 19,
 #' p. 155-175
 #' 
-#' Hansen, J. F. (1980). The clinical diagnoisis of ichaeme heart disease du to
-#' coronary artery disease. Danish Medical Bulletin
 #' 
+#'
 #' @keywords datasets
 #' @usage data(cad1)
 #' 
@@ -234,7 +266,7 @@
 #' Simulated data from the Chest Clinic example
 #' 
 #' Simulated data from the Chest Clinic example (also known as the Asia
-#' example) from Lauritzen and Spiegelhalter, 1988.
+#' example) from Lauritzen and Spiegelhalter, 1988 (see reference below).
 #' 
 #' @name data-chestSim
 #'
@@ -244,20 +276,24 @@
 #'
 #' @format A data frame with 500 observations on the following 8 variables.
 #'   \describe{
-#'   \item{\code{asia}}{a factor with levels \code{yes} \code{no}}
-#'   \item{\code{tub}}{a factor with levels \code{yes} \code{no}}
-#'   \item{\code{smoke}}{a factor with levels \code{yes} \code{no}}
-#'   \item{\code{lung}}{a factor with levels \code{yes} \code{no}}
-#'   \item{\code{bronc}}{a factor with levels \code{yes} \code{no}}
-#'   \item{\code{either}}{a factor with levels \code{yes} \code{no}}
-#'   \item{\code{xray}}{a factor with levels \code{yes} \code{no}}
-#'   \item{\code{dysp}}{a factor with levels \code{yes} \code{no}}
+#'   \item{\code{asia}}{Recent visit to Asia?; a factor with levels \code{yes} \code{no}}
+#'   \item{\code{tub}}{Has tuberculosis?; a factor with levels \code{yes} \code{no}}
+#'   \item{\code{smoke}}{Is a smoker?; a factor with levels \code{yes} \code{no}}
+#'   \item{\code{lung}}{Has lung cancer?; a factor with levels \code{yes} \code{no}}
+#'   \item{\code{bronc}}{Has bronchitis?; a factor with levels \code{yes} \code{no}}
+#'   \item{\code{either}}{Either lung cancer or tuberculosis?; a factor with levels \code{yes} \code{no}}
+#'   \item{\code{xray}}{Positive x-ray? a factor with levels \code{yes} \code{no}}
+#'   \item{\code{dysp}}{Dyspnoea (shortness of breath)?; a factor with levels \code{yes} \code{no}}
 #' }
+#'
+#' @details Notice that the chest clinic example is a contrieved
+#'     example; it does not originate from an empirical study.
 #' 
 #' @references Lauritzen and Spiegelhalter (1988) Local Computations
 #'     with Probabilities on Graphical Structures and their
 #'     Application to Expert Systems (with
 #'     Discussion). J. Roy. Stat. Soc. 50, p. 157-224.
+#' 
 #' @keywords datasets
 #' @usage data(chestSim500)
 #' 
@@ -331,10 +367,11 @@
 #' Lizard behaviour
 #' 
 #' In a study of lizard behaviour, characteristics of 409 lizards were
-#' recorded, namely species (S), perch diameter (D) and perch height (H). The
-#' focus of interest is in how the propensities of the lizards to choose perch
-#' height and diameter are related, and whether and how these depend on
-#' species.
+#' recorded, namely species (S), perch diameter (D) and perch height
+#' (H). Perch means preferred place to settle down (a branch on a
+#' tree).  The focus of interest is in how the propensities of the
+#' lizards to choose perch height and diameter are related, and
+#' whether and how these depend on species.
 #' 
 #' @name data-lizard
 #' @aliases lizard lizardRAW lizardAGG
@@ -397,16 +434,19 @@
 #'
 #' @name data-mildew
 #' @docType data
-#' @format The format is: 
-#'  table [1:2, 1:2, 1:2, 1:2, 1:2, 1:2] 0 0 0 0 3 0 1 0 0 1 ...
-#' - attr(*, "dimnames")=List of 6
-#'  ..$ la10: chr [1:2] "1" "2"
-#'  ..$ locc: chr [1:2] "1" "2"
-#'  ..$ mp58: chr [1:2] "1" "2"
-#'  ..$ c365: chr [1:2] "1" "2"
-#'  ..$ p53a: chr [1:2] "1" "2"
-#'  ..$ a367: chr [1:2] "1" "2"
-#' 
+#' @format A 6 dimensional array where each variable has levels "1" and "2".
+#' The variables are: `la10`, `locc`, `mp58`, `c365`, `p53a` and `a365`.
+## ' format i
+## '  table [1:2, 1:2, 1:2, 1:2, 1:2, 1:2] 0 0 0 0 3 0 1 0 0 1 ...
+## ' - attr(*, "dimnames")=List of 6
+## '  ..$ la10: chr [1:2] "1" "2"
+## '  ..$ locc: chr [1:2] "1" "2"
+## '  ..$ mp58: chr [1:2] "1" "2"
+## '  ..$ c365: chr [1:2] "1" "2"
+## '  ..$ p53a: chr [1:2] "1" "2"
+## '  ..$ a367: chr [1:2] "1" "2"
+## #' 
+#'
 #' @references Christiansen, S.K., Giese, H (1991) Genetic analysis of
 #'     obligate barley powdery mildew fungus based on RFLP and
 #'     virulence loci. Theor. Appl.  Genet. 79:705-712
@@ -677,8 +717,7 @@
 ## #'   numeric vector} 
 #' }
 #'
-#' 
-#' @references Martin, P. G. P., Guillou, H., Lasserre, F., D<e9>jean,
+#' @references Martin, P. G. P., Guillou, H., Lasserre, F., D'jean,
 #'     S., Lan, A., Pascussi, J.-M., San Cristobal, M., Legrand, P.,
 #'     Besse, P. and Pineau, T. (2007). Novel aspects of
 #'     PPARa-mediated regulation of lipid and xenobiotic metabolism
@@ -686,7 +725,7 @@
 #'
 #' @source The data were provided by Pascal Martin from the Toxicology
 #'     and Pharmacology Laboratory, National Institute for Agronomic
-#'     Research, French.
+#'     Research, France.
 #'
 #' @keywords datasets
 #' @usage data(Nutrimouse)
@@ -696,6 +735,30 @@
 #' data(Nutrimouse)
 #' 
 "Nutrimouse"
+
+
+
+#' Personality traits
+#'
+#' The `peronality` dataframe has 240 rows and 32 columns
+#'
+#' @name data-personality
+#'
+#' @format This dataframe has recordings on the following 32
+#'     variables: distant, talkatv, carelss, hardwrk, anxious,
+#'     agreebl, tense, kind, opposng, relaxed, disorgn, outgoin,
+#'     approvn, shy, discipl, harsh, persevr, friendl, worryin,
+#'     respnsi, contrar, sociabl, lazy, coopera, quiet, organiz,
+#'     criticl, lax, laidbck, withdrw, givinup, easygon
+#'
+#' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
+#' @references Origin unclear
+#' @keywords datasets
+#' @usage data(personality)
+#' @examples
+#' data(personality)
+#' str(personality)
+"personality"
 
 
 #' Weightloss of rats
@@ -773,10 +836,10 @@
 #' }
 #' 
 #' @references See references at
-#'     \url{http://archive.ics.uci.edu/ml/datasets/Wine}
+#'   \url{https://archive.ics.uci.edu/ml/datasets/Wine/}
 #'
 #' @source Frank, A. & Asuncion, A. (2010). UCI Machine Learning
-#'     Repository [http://archive.ics.uci.edu/ml]. Irvine, CA:
+#'     Repository \url{https://archive.ics.uci.edu/ml/}. Irvine, CA:
 #'     University of California, School of Information and Computer
 #'     Science.
 #'

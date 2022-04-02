@@ -1,3 +1,20 @@
+gRbase v1.8.7 (Release date: 2022-02-12)
+==========================================
+
+Changes:
+
+  * More imports from graph
+
+  * Updated data descriptions
+
+  * Various bugs fixed
+
+  * tabDist has been enhanced
+
+  * fixed RcppEigen issue raised by Dirk E
+
+
+
 gRbase v1.8-6.7 (Release date: 2020-06-28)
 ==========================================
 

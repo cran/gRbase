@@ -3,16 +3,22 @@
 \name{graph-create}
 \alias{graph-create}
 \alias{ug}
+\alias{ugi}
 \alias{ugList}
 \alias{dag}
+\alias{dagi}
 \alias{dagList}
 \title{Create undirected and directed graphs}
 \usage{
 ug(..., result = "graphNEL")
 
+ugi(...)
+
 ugList(x, result = "graphNEL")
 
 dag(..., result = "graphNEL", forceCheck = FALSE)
+
+dagi(..., forceCheck = FALSE)
 
 dagList(x, result = "graphNEL", forceCheck = FALSE)
 }
@@ -20,7 +26,7 @@ dagList(x, result = "graphNEL", forceCheck = FALSE)
 \item{\dots}{A generating class for a graph, see examples below}
 
 \item{result}{The format of the graph. The possible choices are
-"graphNEL" (for a `graphNEL` object), "igraph" (for an `igraph`
+"graphNEL" (for a \code{graphNEL} object), "igraph" (for an \code{igraph}
 object), "matrix" (for an adjacency matrix), "dgCMatrix" (for a
 sparse matrix).}
 
@@ -33,12 +39,12 @@ using the \code{dag()} function.}
 }
 \value{
 Functions \code{ug()}, and \code{dag()} can return a
-    \code{graphNEL} object, an `igraph` object, a sparse or a dense
-    adjacency matrix.
+\code{graphNEL} object, an \code{igraph} object, a sparse or a dense
+adjacency matrix.
 }
 \description{
 These functions are wrappers for creation of graphs as
-    implemented by graphNEL objects in the \code{graph} package.
+implemented by graphNEL objects in the \code{graph} package.
 }
 \examples{
 

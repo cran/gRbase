@@ -273,6 +273,13 @@ vchi.graphNEL <- function(object, getv=TRUE, forceCheck=TRUE){
     else
         out
 }
+
+#' @export
+## #' @rdname graph-vpar
+vchi.igraph <- function(object, getv=TRUE, forceCheck=TRUE){
+    vchi.graphNEL(as(object, "graphNEL"), getv=getv, forceCheck=forceCheck)
+}
+
 #' @export
 ## #' @rdname graph-vpar
 vchi.Matrix <- vchiMAT
@@ -292,9 +299,14 @@ vpar <- function(object, getv=TRUE, forceCheck=TRUE){
 vparMAT <- function(object, getv=TRUE, forceCheck=TRUE){
   if (forceCheck && !is.adjMAT(object))
     stop("Matrix is not adjacency matrix... \n")
-  if (forceCheck && isSymmetric(object))
-    stop("Graph is undirected; (v, pa(v)) does not exist...\n")
 
+  only_zeros <- sum(abs(object)) < 1e-12
+  
+  if (!only_zeros){
+      if (forceCheck && isSymmetric(object))
+          stop("Graph is undirected; (v, pa(v)) does not exist...\n")
+  }
+  
   vn <- rownames(object)
   out <- lapply(seq_along(vn),
                 function(j) vn[c(j, which(object[, j]!=0))])
@@ -309,9 +321,15 @@ vparMAT <- function(object, getv=TRUE, forceCheck=TRUE){
 #' @export
 ## #' @rdname graph-vpar
 vpar.graphNEL <- function(object, getv=TRUE, forceCheck=TRUE){
-    if (forceCheck && graph::edgemode(object)=="undirected")
-        stop("Graph is undirected; (v,pa(v)) does not exist...\n")
 
+    ## ## FIXME: PERHAPS NOT A GOOD IDEA:
+    ## no_edges  <- all(sapply(graph::edges(object), length) == 0)
+
+    ##    if (!no_edges){
+        if (forceCheck && graph::edgemode(object)=="undirected")
+            stop("Graph is undirected; (v,pa(v)) does not exist...\n")
+    ##}
+    
     ch <- graph::edges(object) ## Nodes and their children
     vn <- names(ch)
     tf <- lapply(seq_along(ch),
@@ -329,6 +347,12 @@ vpar.graphNEL <- function(object, getv=TRUE, forceCheck=TRUE){
         lapply(out, function(x)x[-1])
     else
         out
+}
+
+#' @export
+## #' @rdname graph-vpar
+vpar.igraph <- function(object, getv=TRUE, forceCheck=TRUE){
+    vpar.graphNEL(as(object, "graphNEL"), getv=getv, forceCheck=forceCheck)
 }
 
 #' @export
@@ -485,6 +509,47 @@ random_dag <- function(V, maxpar=3, wgt=0.1){
     dg
 }
 
+
+#' Create regression matrix matrix from DAG
+#
+#' A DAG can be represented as a triangular matrix of regression coefficients. 
+#'
+#' @param object A graph, either a graphNEL or an igraph object.
+#'
+#' @examples
+#' 
+#' g <- dag(~x2|x1 + x3|x1:x2 + x4|x3)
+#' gi <- as(g, "igraph")
+#' dag2chol(g)
+#' dag2chol(gi)
+#' 
+
+#' @export
+dag2chol <- function(object) {
+    stopifnot("Not graphNEL, igraph or adjacency matrix"=
+                  inherits(object, c("graphNEL", "igraph", "matrix", "Matrix")))
+    if (inherits(object, c("matrix", "Matrix")))
+        stopifnot("Not adjacency matrix"=is_adjMAT(object))
+    
+    to <- topoSort(object)
+    stopifnot("Graph is not a DAG"= length(to) != 0)
+    
+    vp <- vpar(object)[to]
+  
+    vn <- names(vp)
+    Lo <- diag(1, length(vn))
+    rownames(Lo) <- colnames(Lo) <- vn
+    
+    for (i in seq_along(vn)) {
+        pa <- vp[[i]][-1]
+        if (length(pa) > 0) {
+            vn[i]
+            idx <- match(pa, vn)
+            Lo[i, idx] <- paste0("-a", i, idx)
+        }
+    }
+    list(L=Lo, vn=vn)
+}
 
 
 

@@ -50,7 +50,6 @@ tabDiv0     <- tab_div0_
 #' @rdname api-tabX
 tabOp     <- tab_op_
 
-
 #' @export
 #' @rdname api-tabX
 tabEqual  <- tab_equal_
@@ -64,13 +63,6 @@ tabExpand <- function(tab, aux, type=0L){  ## FIXME Rethink this
     
     tab_expand_(tab, aux, type)
 }
-
-## if (!is.named.array(tab)) stop("'tab' not a named array")
-## if (!is.null(aux))
-##     if (!(is.numeric(aux) || is.character(aux) || inherits(aux, "formula")))
-##         stop("'aux' must be character/numeric vector or right hand sided formula")
-
-## aux <- .get_perm_or_marg(tab, aux)
 
 
 ## tabMult used by grain; 
@@ -257,24 +249,74 @@ tabNormalize <- function(tab, type="none"){
 #' 
 NULL
 
-
 #' @export
 #' @rdname api-tabDist
-tabDist <- function(tab, marg=NULL, cond=NULL, normalize=TRUE){
+tabDist <- function (tab, marg = NULL, cond = NULL, normalize = TRUE) {
+
+    if (!is.list(cond))
+        .tabDist(tab, marg=marg, cond=cond, normalize=normalize)
+    else{
+        ## Are there formulae in cond?
+        ## print(cond)
+        idx <- sapply(cond, function(x) inherits(x, "formula"))
+        ## If yes, turn these into a vector
+        cond1 <- sapply(cond[idx], rhsf2list)
+        cond1 <- unlist(cond1)
+        ## cond1
+
+        ## Look at the rest 
+        cond2 <- cond[!idx]
+        ## cond2
+        ## Are there names in the rest?
+        if (is.null(names(cond2))){
+            ## No, so the rest is just a list (of characters, hopefully)
+            cond3 <- unlist(cond2)
+            cond2  <- NULL
+            condnv <- NULL ## nv means name=value
+        } else {
+            ## Yes, and take the elements with names and put into
+            ## condnv; put the rest into cond3
+            idx2  <- nchar(names(cond2)) == 0
+            cond3 <- unlist(cond2[idx2])
+            condnv <- cond2[!idx2]
+        }
+        
+        condset <- c(cond1, cond3)
+
+        ##str(list(marg=marg, condset=condset, condnv=condnv))
+
+        ## ALternative : use tabSlice
+        if (!is.null(condnv))    
+            tab <- .tabDist(tab, cond=condnv, normalize=normalize)
+
+        ## if (!is.null(condset))
+        tab <- .tabDist(tab, marg=marg, cond=condset, normalize=normalize)
+        return(tab)
+    }
+}
+
+## ' @export
+## ' @rdname api-tabDist
+.tabDist <- function(tab, marg=NULL, cond=NULL, normalize=TRUE){
+
+    ## str(list(marg=marg, cond=cond))
     
     if (!is.named.array(tab))
         stop("'tab' must be a named array")
-    else if (any( tab < 0 ))
+    if (any(tab < 0))
         stop("'tab' must be non-negative")
-    else if (is.null(marg) && is.null(cond)){
-        if (normalize) tab / sum( tab ) else tab
-    } else if ( .is.named.list( cond ) ){
-        if ( !.is.simple.cond( cond ) )
+
+    if ((length(marg)==0) && (length(cond)==0)){
+        if (normalize) return(tab / sum(tab)) else return(tab)
+    }
+
+    if (.is.named.list( cond )){
+        if (!.is.simple.cond( cond ))
             stop("'cond' is not 'simple'; can not proceed\n")
         else {
             ##message("calling tabDist again")
-            tab <- tabSlice( tab, slice = cond, as.array = TRUE )
-            tabDist( tab, marg = marg, normalize = normalize )
+            tab <- tabSlice(tab, slice = cond, as.array = TRUE)
+            tabDist(tab, marg=marg, normalize=normalize)
         }
     } else {
         vset <- names(dimnames( tab ))
@@ -292,18 +334,18 @@ tabDist <- function(tab, marg=NULL, cond=NULL, normalize=TRUE){
             if (length(mset) == 0) stop("Invalid margin specification\n")
         }
 
-        mcset <- c( mset, cset )
-#        str(list(marg=marg, cond=cond, mset=mset, cset=cset, mcset=mcset))
+        mcset <- c(mset, cset)
+        ##str(list(marg=marg, cond=cond, mset=mset, cset=cset, mcset=mcset))
         
         if (!is.null(mcset)){
             tab <- tabMarg(tab, marg = mcset)
         }
         
-        if ( is.null( cset ) ){
+        if (length(cset) == 0){
             if (normalize) tab <- tab / sum(tab)            
         } else {
-            mtab <- tabMarg( tab, marg=cset)
-            tab <- tabDiv( tab, mtab )
+            mtab <- tabMarg(tab, marg=cset)
+            tab  <- tabDiv(tab, mtab)
         } 
         
         if (length(mcset) > 0)
@@ -350,7 +392,7 @@ tabDist <- function(tab, marg=NULL, cond=NULL, normalize=TRUE){
 #' tabSlice2Entries(x, slice=s)
 #' tabSlice2Entries(x, slice=s, complement=TRUE)
 #'
-#' ## ar_slice_mult
+#' ## tabSliceMult 
 #' s2 = tabSliceMult(x, slice=s); s2
 #'
 #' sp = list(c(1,2), c(1,2), TRUE)
@@ -361,24 +403,27 @@ NULL
 #' @export
 #' @rdname api_tabSlice
 tabSlice<- function(tab, slice=NULL, margin=names(slice), drop=TRUE, as.array=FALSE){
-
-    if (!is.named.array(tab))
-        stop("'tab' is not a named array")
-    else if ( is.null( slice ) )
-        tab
-    else if (!( is.character( slice ) || is.numeric( slice ) || is.list( slice )))
-        stop("'slice' is not valid \n")
-    else if (is.null( margin ) || !( is.character( margin ) || is.numeric( margin )))
-        stop("'margin' is not valid \n")
-    else {
-        margin.idx <-
-            if ( is.character( margin ) )
-                match( margin, names( dimnames( tab ) ) )
-            else
-                margin
-        if ( any( is.na( margin.idx ) ) ) stop("invalid 'margin'")
-        tabSlice2( tab, slice, margin.idx, drop=drop, as.array=as.array)
+  
+  if (!is.named.array(tab))
+    stop("'tab' is not a named array")
+  else if ( is.null( slice ) )
+    tab
+  else if (!( is.character( slice ) || is.numeric( slice ) || is.list( slice )))
+    stop("'slice' is not valid \n")
+  else if (is.null( margin ) || !( is.character( margin ) || is.numeric( margin )))
+    stop("'margin' is not valid \n")
+  else {
+    dn <- names(dimnames(tab))
+    margin.idx <- if (is.character(margin)){
+      match(margin, dn)
+    } else margin
+    
+    if (any(idx <- is.na(margin.idx))){
+      cat("Error: Names not in domain : ", toString(margin[idx]), "\n")
+      stop("Invalid 'margin'")      
     }
+    tabSlice2(tab, slice, margin.idx, drop=drop, as.array=as.array)
+  }
 }
 
 #' @export
@@ -422,20 +467,13 @@ tabSliceMult <- function(tab, slice, val=1, comp=0){
 #' @export
 #' @rdname api_tabSlice
 tabSlice2Entries <- function(tab, slice, complement=FALSE){
-    tab[] <- 1:length(tab)
-    out <- tabSlice(tab, slice,  margin=names(slice))
-    if (complement)
-        c(tab)[-c(out)]
-    else
-        c(out)
+  tab[] <- 1:length(tab)
+  out <- tabSlice(tab, slice, margin=names(slice))
+  if (complement)
+    c(tab)[-c(out)]
+  else
+    c(out)
 }
-
-
-
-
-
-
-
 
 
 
@@ -550,4 +588,11 @@ tabSlice2Entries <- function(tab, slice, complement=FALSE){
 
 
 
+
+## if (!is.named.array(tab)) stop("'tab' not a named array")
+## if (!is.null(aux))
+##     if (!(is.numeric(aux) || is.character(aux) || inherits(aux, "formula")))
+##         stop("'aux' must be character/numeric vector or right hand sided formula")
+
+## aux <- .get_perm_or_marg(tab, aux)
 

@@ -65,6 +65,11 @@ next_cell_ <- function(cell, dim) {
 }
 
 #' @rdname api-cell_
+next_cell2_ <- function(cell, dim) {
+    invisible(.Call('_gRbase_next_cell2_', PACKAGE = 'gRbase', cell, dim))
+}
+
+#' @rdname api-cell_
 next_cell_slice_ <- function(cell, dim, slice_marg) {
     .Call('_gRbase_next_cell_slice_', PACKAGE = 'gRbase', cell, dim, slice_marg)
 }
@@ -105,6 +110,10 @@ tab_expand_ <- function(tab, aux, type = 0L) {
 #' @rdname api-tabX_
 tab_align_ <- function(tab1, tab2) {
     .Call('_gRbase_tab_align_', PACKAGE = 'gRbase', tab1, tab2)
+}
+
+tab_marg2_ <- function(tab1, marg) {
+    .Call('_gRbase_tab_marg2_', PACKAGE = 'gRbase', tab1, marg)
 }
 
 #' @rdname api-tabX_
@@ -319,6 +328,10 @@ choose_ <- function(N, K) {
 
 do_combn <- function(N, K) {
     .Call('_gRbase_do_combn', PACKAGE = 'gRbase', N, K)
+}
+
+next_perm_ <- function(vv) {
+    invisible(.Call('_gRbase_next_perm_', PACKAGE = 'gRbase', vv))
 }
 
 solveSPD <- function(X) {

@@ -10,6 +10,7 @@
 \alias{get_superset}
 \alias{is_subsetof}
 \alias{is.subsetof}
+\alias{subsetof}
 \title{Suite of set operations}
 \usage{
 maximal_sets(setlist, index = FALSE)
@@ -27,6 +28,8 @@ get_superset(x, setlist, all = FALSE)
 is_subsetof(set, set2)
 
 is.subsetof(x, set)
+
+subsetof(x, set)
 }
 \arguments{
 \item{setlist}{List of vectors (representing a set of subsets)}
@@ -45,23 +48,23 @@ Set operations for gRbase and related packages.
 }
 \details{
 'setlist' is a list of vectors representing a set of subsets;
- i.e. V1,...VQ where Vk is a subset of some base set V.
+i.e. V1,...VQ where Vk is a subset of some base set V.
 
- 'all' If true, \code{get_superset} will return index of all
- vectors containing the element; otherwise only the first index is
- returned.
+'all' If true, \code{get_superset} will return index of all
+vectors containing the element; otherwise only the first index is
+returned.
 
- \code{is_inset}: Checks if the set
- x is in one of the Vk's.
+\code{is_inset}: Checks if the set
+x is in one of the Vk's.
 
- \code{remove_redundant}: Returns those Vk which are not contained
- in other subsets; i.e. gives the maximal sets. If maximal is FALSE
- then returns the minimal sets; i.e. Vk is returned if Vk is
- contained in one of the other sets Vl and there are no set Vn
- contained in Vk.
- 
- Notice that the comparisons are made by turning the elements into
- characters and then comparing these. Hence 1 is identical to "1".
+\code{remove_redundant}: Returns those Vk which are not contained
+in other subsets; i.e. gives the maximal sets. If maximal is FALSE
+then returns the minimal sets; i.e. Vk is returned if Vk is
+contained in one of the other sets Vl and there are no set Vn
+contained in Vk.
+
+Notice that the comparisons are made by turning the elements into
+characters and then comparing these. Hence 1 is identical to "1".
 }
 \examples{
 
