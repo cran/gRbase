@@ -6,23 +6,25 @@
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
 ##################################################################
 #'
-#' @details If \code{normalize="first"} then for each configuration of
-#'     all other variables than the first, the probabilities are
-#'     normalized to sum to one.  Thus f(a,b,c) becomes a conditional
-#'     probability table of the form p(a|b,c).  If
-#'     \code{normalize="all"} then the sum over all entries of
+#' @details
+#'
+#' 1. If \code{normalize="first"} then for each configuration of all
+#'     other variables than the first, the probabilities are
+#'     normalized to sum to one.  Thus f(a, b, c) becomes a
+#'     conditional probability table of the form p(a | b, c).
+#'
+#' 1. If \code{normalize="all"} then the sum over all entries of
 #'     f(a,b,c) is one.
 #' 
-#'     If \code{smooth} is positive then
-#'     \code{smooth} is added to \code{values} before normalization
-#'     takes place.
+#' 1.  If \code{smooth} is positive then \code{smooth} is added to
+#'     \code{values} BEFORE normalization takes place.
 #' 
-#' @param names Names of variables defining table; a character vector
-#'     or a right hand sided formula.
+#' @param names Names of variables defining table; either a character
+#'     vector or a right hand sided formula.
 #' @param levels 1) a list with specification of the levels of the
 #'     factors in \code{names} or 2) a vector with number of levels of
 #'     the factors in \code{names}. See 'examples' below.
-#' @param values values to go into the parray
+#' @param values values to go into the array.
 #' @param normalize Either "none", "first" or "all". Should result be
 #'     normalized, see 'Details' below.
 #' @param smooth Should values be smoothed, see 'Details' below.
@@ -30,49 +32,69 @@
 #' @keywords utilities
 #' @examples
 #' 
-#' universe <- list(gender=c('male','female'),
-#'                  answer=c('yes','no'),
-#'                  rain=c('yes','no'))
-#' t1 <- tabNew(c("gender","answer"), levels=universe, values=1:4)
+#' universe <- list(gender=c('male', 'female'),
+#'                  answer=c('yes', 'no'),
+#'                  rain=c('yes', 'no'))
+#' t1 <- tabNew(c("gender", "answer"), levels=universe, values=1:4)
 #' t1
 #' t2 <- tabNew(~gender:answer, levels=universe, values=1:4)
 #' t2
-#' t3 <- tabNew(~gender:answer, c(2,2), values=1:4)
+#' t3 <- tabNew(~gender:answer, c(2, 2), values=1:4)
 #' t3
 NULL
 
 #' @export
 #' @rdname api-tabNew             
 tabNew <- function(names, levels, values, normalize="none", smooth=0){
+    
     normalize <- match.arg(normalize, choices=c("none", "first", "all"))
     names <- rhsFormula2list(names)[[1]]
 
-    if (is.list(levels)){
-      vn <- names(levels)
-      if (!all(sapply(vn, nchar) > 0))
-        stop("not all elements in 'levels' are named\n")
-      idx <- match(names, vn)
-      if (any((b <- is.na(idx))))
-        stop(sprintf("Levels for variable(s) %s not found\n", toString(names[b])))
-      else {
-        levels  <- levels[idx] ## those used
-        dn <- lapply(levels, function(d) rhsf2list(d)[[1]])
+    if (is.list(levels))
+    {
+        if (length(levels) == 0){
+            stop("Can not create table\n")
+        }              
+        if (length(levels) == 1){
+            vn <- names(levels)
+            levels <- rep(levels, length(names))
+            names(levels) <- names
+            dn <- lapply(levels, function(d) rhsf2list(d)[[1]])
+            di <- unlist(lapply(dn, length), use.names=FALSE)            
+            
+        } else if (length(levels) > 0){
+            if (!is_named_list(levels)){
+                stop("not all elements in 'levels' are named\n")                    
+            }
+            vn <- names(levels)            
+            idx <- match(names, vn)
+            if (any((b <- is.na(idx)))){
+                stop(sprintf("Levels for variable(s): %s not found\n",
+                             toString(names[b])))           
+            }
+            levels  <- levels[idx] ## those used
+            dn <- lapply(levels, function(d) rhsf2list(d)[[1]])
+            di <- unlist(lapply(dn, length), use.names=FALSE)            
+        }
+        
+    } else if (is.numeric(levels))
+    {
+        di <- levels
+        dn <- make_dimnames(names, levels)
+    } else if (is.character(levels))
+    {
+        dn <- rep(list(levels), length(names))
+        names(dn) <- names
         di <- unlist(lapply(dn, length), use.names=FALSE)
-      }
-    } else if (is.numeric(levels)){
-      di <- levels
-      dn <- .make.dimnames(names, levels)
-    } else if (is.character(levels)){
-      dn <- rep(list(levels), length(names))
-      names(dn) <- names
-      di <- unlist(lapply(dn, length), use.names=FALSE)
-    } else stop("Can not create 'tab' object")
+    } else {
+        stop("Can not create 'tab' object")
+    }
 
-    
     if (missing(values))
         values <- 1
     if (smooth > 0)
         values <- values + smooth
+
     
     if (is.atomic(values) && !is.object(values)){
         out <- array(values, dim=di, dimnames=dn)
@@ -81,10 +103,26 @@ tabNew <- function(names, levels, values, normalize="none", smooth=0){
 }
 
 
+        ## check that levels is a named list
+            ## vn <- names(levels)
+            ## if (is.null(vn)){
+                ## stop("'levels' is a list with no names\n")
+            ## } else {
+            ## }
+    
+
+is_named_list <- function(x){
+    if (!inherits(x, "list"))
+        return(FALSE)
+    vn <- names(x)
+    if (is.null(vn))
+        return(FALSE)
+    all(nchar(vn) > 0)
+}
 
 
-## FIXME .make.dimnames findes også (cirka) i parray. Redundans
-.make.dimnames <- function(names, levels){
+## FIXME make_dimnames findes også (cirka) i parray. Redundans
+make_dimnames <- function(names, levels){
     if ( !(is.atomic(names) && is.numeric(levels)) )
         stop("Can not create dimnames")
 
@@ -96,13 +134,31 @@ tabNew <- function(names, levels, values, normalize="none", smooth=0){
                       1:levels[i]
                   })
     
-    dn <- lapply(seq_along(levels),
-                 function(i){
-                     paste(names[i], dn[[i]], sep="")
-                 })
+    ## dn <- lapply(seq_along(levels),
+                 ## function(i){
+                     ## paste(names[i], dn[[i]], sep="")
+                 ## })
 
     names(dn) <- names
     dn
 }
 
 
+
+
+
+                
+        ## print(vn)
+        ## if (!all(sapply(vn, nchar) > 0)){
+            ## print(vn)
+            ## stop("not all elements in 'levels' are named\n")
+        ## }
+        ## idx <- match(names, vn)
+        ## if (any((b <- is.na(idx))))
+            ## stop(sprintf("Levels for variable(s): %s not found\n",
+                         ## toString(names[b])))
+        ## else {
+            ## levels  <- levels[idx] ## those used
+            ## dn <- lapply(levels, function(d) rhsf2list(d)[[1]])
+            ## di <- unlist(lapply(dn, length), use.names=FALSE)
+        ## }

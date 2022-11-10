@@ -1,7 +1,7 @@
 c40d1c2768d3c93d7d4809843a4ce599 *ChangeLog
-d33a4e17a5a97a34496da8575f1a92c4 *DESCRIPTION
+fafb48db102a72628bf7ac42d0f915e2 *DESCRIPTION
 9c0793305cdffb7d17db6c0ebf260caa *NAMESPACE
-e6af43409949ab81fe6beb97eaa11fcc *NEWS
+e5a9db11768cfb197ec795251081aa94 *NEWS
 58aabfd95e8e6c2792e728f6703b8bf0 *R/DATA-cad.R
 99f8c48412ddf2f7b3e124e6c3c1fd06 *R/NAMESPACE.R
 6207efed5f2c1872829073a40b8ccfc4 *R/RcppExports.R
@@ -10,8 +10,8 @@ dc1a2d478b69842f60a0a321e497e4de *R/api_array_parray.R
 de340a8345ecec5335978374978ec3c1 *R/api_array_pct.R
 54177bdfc3b648160f9b3344acb48dd4 *R/api_array_properties.R
 64094e2733261ef4d06c7d09aa4732dc *R/api_array_simulate.R
-a93f818f3054b0ccff8c328a9e809408 *R/api_array_tab-create.R
-7862da7b0ff515cf02740dc27adb16bb *R/api_array_tabX.R
+e0596a94a0075987193a8f9d8d1d53c9 *R/api_array_tab-create.R
+e4ec4952abb211b4211c59ce5e613969 *R/api_array_tabX.R
 78887ce3b19281e69ec4900bc6b3928b *R/api_array_tableX_bristol.R
 2751dfc4e5928e7ec7b1b07fc40ada2e *R/api_setops.R
 7a202b28aea941f6da5aa4d2e18c8c06 *R/cov2pcor.R
@@ -43,9 +43,9 @@ e0357948f07adc4f2a2b1fd6430d7534 *R/xxx_downstream-depends.R
 1929eb8f3243c59b77b906aed5b9fa2d *R/yyOLD-gRbase.R
 0337eaf8e5057f3655d3b75d3644b0a1 *R/yyyPrim.R
 ee2e8bb45326d6cb48d563b0c974bc5e *R/zzz.R
-7e94f637e1e16845160d93c21ba0f583 *README.md
+f1cf8461a12e79a68e1ef1f2aa5fb88a *README.md
 3830aeb12123b162ca0515508c69b4a3 *TODO
-effacdb5a74d29462f2c34ad5c65938f *build/vignette.rds
+8c0dd9a71af8f6e5d82f33e518483fae *build/vignette.rds
 5ca9c422bb2c881639991035bbfac2ed *data/BodyFat.RData
 14fb8a4b6a967369a78856970eaedeb4 *data/Nutrimouse.rda
 5e8b5b759446fd2b421ef383bdeb9633 *data/ashtrees.RData
@@ -82,10 +82,10 @@ d22303b741e32cffaeb8bc65b76bb8be *demo/cadcomplete.R
 a2ca06537b5561fecc85a32efae0de29 *inst/CITATION
 b26999b690f9ded7a64d2f8fc01e0293 *inst/doc/arrays.R
 db76d1a7032aa12dd04894887c19c9a7 *inst/doc/arrays.Rnw
-3c03c8cc5b61f24d9c99d4044f8cd50b *inst/doc/arrays.pdf
+c3b853c64aea6cf61d1f091359d465af *inst/doc/arrays.pdf
 8cb5cfa8fcc6e585e1e1e07bc6f8869f *inst/doc/graphs.R
 b790a490f4e8c3ab85fb78633867484f *inst/doc/graphs.Rnw
-e50cd643af8eed61c2131840129e54ed *inst/doc/graphs.pdf
+34acb72bca2094e987887237f6178315 *inst/doc/graphs.pdf
 d5735fb64d570a7048c68effbf5a8b18 *inst/include/gRbase.h
 c82051348dabb20d47f18f7d7ef1f678 *inst/include/gRbase_RcppExports.h
 2ecb1504f669fc99541580afff95e271 *inst/include/gRbase_typedefs.h
@@ -103,7 +103,7 @@ ed238c71c6f89907aad84f5e53ae6c3d *man/api-cell_.Rd
 7ba159eebaa25957fd06ad137d9a0d39 *man/api-parray.Rd
 5e92d15d486c3560fa49fe89f6a5df70 *man/api-pct-operations.Rd
 f52faeb94b1aed9cf68da58085698b9c *man/api-tabDist.Rd
-39e5acfa5e54ef30e157a223e2262288 *man/api-tabNew.Rd
+1c128e12b645952467385f0dd8ce6f19 *man/api-tabNew.Rd
 009caea7a09070c0babfc5edf1ee752d *man/api-tabX.Rd
 20027ce9a8a6b49a450053ed025584a5 *man/api-tabX_.Rd
 20b07039cf212865957c8888b14f6772 *man/api_tabSlice.Rd
@@ -170,9 +170,9 @@ a56329da606d58fecafbd141199c7674 *src/_g_moralizeMAT.cpp
 36ab2dbd455f030420532fa45109c314 *src/_g_topoSortMAT.h
 9d82b3149014003246b5cb8c91cfef0a *src/_g_triangulate-elo-MAT.cpp
 36f5f04859cb7e3f9f4d101b9bc14ac6 *src/_g_triangulate-mcwh-MAT.cpp
-99f3e58d430b073dd0f5c0d791928d04 *src/_u_rowsums_etc.c
+53c5e717e26fd88decd516df01919756 *src/_u_rowsums_etc.c
 f31d6323a24560e2243b8ffa2db8f099 *src/api_array_cell.cpp
-93368dd47123ba184ec2516ec4e7ef12 *src/api_array_tab_X.cpp
+46a07c92f6962a75b0b8da5c32f0ae1c *src/api_array_tab_X.cpp
 1747fcefc7a862747ff03a46120c3d1b *src/api_matrix_coerce-M2ftM.cpp
 691c3ac3e301960b35a838066e317133 *src/api_matrix_coerce-list2M.cpp
 9df8bb1aad435c3916957e509c78ac96 *src/api_matrix_coerce_dense_sparse.cpp
