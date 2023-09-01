@@ -32,6 +32,8 @@
 #' @export
 #' @rdname graph-coerce-api
 g_gn2dm_ <- function(object) {
+    .Deprecated(msg=dep_text_1)
+
     .check.is.graphNEL(object)
     as(igraph::as_adjacency_matrix(as(object, "igraph")), "matrix")
 
@@ -40,6 +42,7 @@ g_gn2dm_ <- function(object) {
 #' @export
 #' @rdname graph-coerce-api
 g_gn2sm_ <- function(object) {
+    .Deprecated(msg=dep_text_1)
     .check.is.graphNEL(object)
     igraph::as_adjacency_matrix(as(object, "igraph"))
 }
@@ -47,6 +50,7 @@ g_gn2sm_ <- function(object) {
 #' @export
 #' @rdname graph-coerce-api
 g_gn2ig_ <- function(object){
+    .Deprecated(msg=dep_text_1)
     .check.is.graphNEL(object)
     igraph::igraph.from.graphNEL(object)
 }
@@ -58,6 +62,7 @@ g_gn2ig_ <- function(object){
 #' @export
 #' @rdname graph-coerce-api
 g_dm2gn_ <- function(object) {
+    .Deprecated(msg=dep_text_1)
     as(object, "graphNEL")
 }
 
@@ -83,6 +88,7 @@ g_dm2ig_ <- function(object){
 #' @export
 #' @rdname graph-coerce-api
 g_sm2gn_ <- function(object) {
+    .Deprecated(msg=dep_text_1)
     as(object, "graphNEL")
 }
 
@@ -107,6 +113,7 @@ g_sm2ig_ <- g_dm2ig_
 #' @export
 #' @rdname graph-coerce-api
 g_ig2gn_ <- function(object) {
+    .Deprecated(msg=dep_text_1)
     igraph::igraph.to.graphNEL(object)
 }
 
@@ -129,6 +136,7 @@ g_ig2sm_ <- function(object) {
 #' @export
 #' @rdname graph-coerce-api
 g_xm2gn_ <- function( object ){ ## M | graphNEL
+    .Deprecated(msg=dep_text_1)
     .check.is.matrix( object )
     as(object , "graphNEL")
 }
@@ -170,6 +178,7 @@ g_xm2xm_ <- function(object, result="matrix"){
 #' @export
 #' @rdname graph-coerce-api
 g_gn2xm_ <- function(object, result="matrix"){
+    .Deprecated(msg=dep_text_1)
     switch(result,
            "matrix"={g_gn2dm_(object)},
            "Matrix"=,
@@ -179,12 +188,14 @@ g_gn2xm_ <- function(object, result="matrix"){
 #' @export
 #' @rdname graph-coerce-api
 g_gn2ftM_ <- function(object){
+    .Deprecated(msg=dep_text_1)
     adjList2ftM__(graph::edges(object))
 }
 
 #' @export
 #' @rdname graph-coerce-api 
 g_gn2tfM_ <- function(object){
+    .Deprecated(msg=dep_text_1)
     adjList2tfM__(graph::edges(object))
 }
 

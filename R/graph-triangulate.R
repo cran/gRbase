@@ -175,6 +175,9 @@ triang_elo.default <- function(object, order=NULL, result=NULL, check=TRUE, ...)
 
     graph_class <- c("graphNEL", "igraph", "matrix", "dgCMatrix")
     chk <- inherits(object, graph_class, which=TRUE)
+
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)
+    
     if (!any(chk)) stop("Invalid class of 'object'\n")
 
     cls <- graph_class[which(chk > 0)]

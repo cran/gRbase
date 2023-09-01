@@ -4,7 +4,6 @@
 #ifndef RCPP_gRbase_RCPPEXPORTS_H_GEN_
 #define RCPP_gRbase_RCPPEXPORTS_H_GEN_
 
-#include <RcppEigen.h>
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 

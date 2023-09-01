@@ -76,6 +76,10 @@ ugi <- function(...){
 #' @export
 #' @rdname graph-create
 ugList <- function(x, result="graphNEL"){
+    if (identical(result, "graphNEL")){
+        .Deprecated(msg=dep_text_1)
+    }
+
     result <- match.arg(result, c("graphNEL", "matrix", "dgCMatrix", "igraph", "Matrix", "NEL"))
     .spam.result(result)
     
@@ -110,6 +114,9 @@ dagi <- function(..., forceCheck=FALSE){
 #' @export
 #' @rdname graph-create
 dagList <- function(x, result="graphNEL", forceCheck=FALSE){
+    if (identical(result, "graphNEL")){
+        .Deprecated(msg=dep_text_1)
+    }
     result <- match.arg(result, c("graphNEL", "matrix", "dgCMatrix", "igraph", "Matrix", "NEL"))
     .spam.result(result)
     

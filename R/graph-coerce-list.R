@@ -47,6 +47,8 @@
 #' @export
 #' @rdname graph-coerce-list
 g_ugl2gn_ <- function(glist, vn=NULL){
+    .Deprecated(msg=dep_text_1)
+
     if (is.null(vn)) vn <- unique.default(unlist(glist))
     zzz <- lapply(glist, function(xx) names2pairs(xx, sort=TRUE, result="matrix"))
     ftM <- do.call(rbind, zzz)
@@ -62,6 +64,8 @@ g_ugl2gn_ <- function(glist, vn=NULL){
 #' @export
 #' @rdname graph-coerce-list
 g_ugl2ig_ <- function(zz, vn=NULL) {
+    .Deprecated(msg=dep_text_1)
+    
     gg <- igraph::igraph.from.graphNEL(g_ugl2gn_(zz, vn))
     igraph::V(gg)$label <- igraph::V(gg)$name
     gg
@@ -84,6 +88,10 @@ g_ugl2sm_ <- function(zz, vn=NULL){
 #' @export
 #' @rdname graph-coerce-list
 g_ugl2XX_ <- function(zz, outtype, vn=NULL) {
+    if (identical(outtype, "graphNEL")){
+        .Deprecated(msg=dep_text_1)
+    }
+
     switch(outtype,
            "graphNEL"   ={g_ugl2gn_(zz, vn)},
            "igraph"     ={g_ugl2ig_(zz, vn)},
@@ -102,6 +110,8 @@ g_ugl2XX_ <- function(zz, outtype, vn=NULL) {
 #' @export
 #' @rdname graph-coerce-list
 g_dagl2gn_ <- function(glist, vn=NULL){
+    .Deprecated(msg=dep_text_1)
+
     if (is.null(vn)) vn <- unique.default(unlist(glist))
     zzz <- lapply(glist, function(xx) names2pairs(xx[1],xx[-1],
                                                   sort=FALSE, result="matrix"))
@@ -117,7 +127,10 @@ g_dagl2gn_ <- function(glist, vn=NULL){
 
 #' @export
 #' @rdname graph-coerce-list
-g_dagl2ig_ <- function(zz, vn=NULL){    
+g_dagl2ig_ <- function(zz, vn=NULL){
+
+    .Deprecated(msg=dep_text_1)
+
     gg <- igraph::igraph.from.graphNEL(g_dagl2gn_(zz, vn))
     igraph::V(gg)$label <- igraph::V(gg)$name
     gg
@@ -140,6 +153,8 @@ g_dagl2sm_ <- function(zz, vn=NULL) {
 #' @export
 #' @rdname graph-coerce-list
 g_dagl2XX_ <- function(zz, outtype, vn=NULL) {
+
+    if (identical(outtype, "graphNEL")) .Deprecated(msg=dep_text_1)
     switch(outtype,
            "graphNEL"   ={g_dagl2gn_(zz, vn)},
            "igraph"     ={g_dagl2ig_(zz, vn)},
@@ -174,6 +189,8 @@ g_adl2sm_ <- function(zz) adjList2dgCMatrix__(zz)
 #' @export
 #' @rdname graph-coerce-list
 g_adl2XX_ <- function(zz, outtype) {
+    if (identical(outtype, "graphNEL")) .Deprecated(msg=dep_text_1)
+
     switch(outtype,
            "graphNEL"   ={g_adl2gn_(zz)},
            "igraph"     ={g_adl2ig_(zz)},

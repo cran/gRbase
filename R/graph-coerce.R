@@ -69,7 +69,9 @@ setAs("dgCMatrix", "igraph",   function(from) g_sm2ig_(from))
 #' @param intype The desired output outtype (only relevant if object is a list)
 #' 
 graph_as  <- function(object, outtype, intype=NULL){
-    
+
+    if (identical(outtype, "graphNEL"))  .Deprecated(msg=dep_text_1)
+
     if (!inherits(object, c(.graph_type(), "list", "formula")))
         stop("Wrong input format\n")
        

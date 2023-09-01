@@ -60,6 +60,9 @@ edgeList <- function(object, matrix=FALSE)
 #' @export
 ## #' @rdname graph-edgeList
 edgeList.default <- function(object, matrix=FALSE){
+
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)
+    
     if (inherits(object, c("graphNEL", "igraph")))
         return(edgeListMAT(as(object, "matrix"), matrix=matrix))
     if (inherits(object, c("dgCMatrix", "matrix")))
@@ -93,6 +96,9 @@ nonEdgeList <- function(object, matrix=FALSE)
 #' @export
 ## #' @rdname graph-edgeList
 nonEdgeList.default <- function(object, matrix=FALSE){
+
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)
+    
     if (inherits(object, c("graphNEL", "graphNEL")))
         return(nonEdgeListMAT(as(object, "matrix"), matrix=matrix))
     if (inherits(object, c("dgCMatrix", "matrix")))
@@ -135,6 +141,9 @@ nonEdgeListMAT <- function(adjmat, matrix=FALSE){
 #' @export
 #' @rdname graph-ug2dag
 ug2dag <- function(gn){
+
+    if (inherits(gn, "graphNEL")) .Deprecated(msg=dep_text_1)
+    
     if (!inherits(gn, "graphNEL")) stop("'gn' not a graphNEL object...")        
     if (graph::edgemode(gn) != "undirected") stop("Graph must have undirected edges")
 
@@ -257,6 +266,9 @@ vchiMAT <- function(object, getv=TRUE, forceCheck=TRUE){
 #' @export
 ## #' @rdname graph-vpar
 vchi.graphNEL <- function(object, getv=TRUE, forceCheck=TRUE){
+
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)
+    
     if (forceCheck && graph::edgemode(object)=="undirected")
         stop("Graph is undirected; (v,pa(v)) does not exist...\n")
 
@@ -322,6 +334,7 @@ vparMAT <- function(object, getv=TRUE, forceCheck=TRUE){
 ## #' @rdname graph-vpar
 vpar.graphNEL <- function(object, getv=TRUE, forceCheck=TRUE){
 
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)    
     ## ## FIXME: PERHAPS NOT A GOOD IDEA:
     ## no_edges  <- all(sapply(graph::edges(object), length) == 0)
 
@@ -415,6 +428,7 @@ get_cliques <- function(object){
 
 #' @export 
 get_cliques.graphNEL <- function(object){
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)
     max_cliqueMAT(as(object, "matrix"))[[1]]
 }
 
@@ -526,6 +540,7 @@ random_dag <- function(V, maxpar=3, wgt=0.1){
 
 #' @export
 dag2chol <- function(object) {
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)
     stopifnot("Not graphNEL, igraph or adjacency matrix"=
                   inherits(object, c("graphNEL", "igraph", "matrix", "Matrix")))
     if (inherits(object, c("matrix", "Matrix")))
@@ -561,7 +576,7 @@ dag2chol <- function(object) {
 ##
 ## SHD version of DED's dual rep; based on faster set operations
 ##
-#' @export
+
 .dual.rep <- function(glist, S, minimal=TRUE) {
     ## S is total varset - often but by no means always given by unique(unlist(g.list))
     list.save <- list()

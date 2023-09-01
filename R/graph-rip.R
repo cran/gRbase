@@ -88,6 +88,8 @@ rip <- function(object, ...){
 #' @rdname graph-rip
 rip.default <- function(object, root=NULL, nLevels=NULL, ...){
 
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)
+    
     if (!inherits(object, c("graphNEL", "igraph", "matrix", "dgCMatrix")))
         stop("Object of correct type\n")
 
@@ -262,6 +264,8 @@ junction_tree <- function(object, ...){
 #' @rdname graph-rip
 junction_tree.default <-  function(object, nLevels = NULL, ...){
 
+    if (inherits(object, "graphNEL")) .Deprecated(msg=dep_text_1)
+    
     if (!inherits(object, c("graphNEL", "igraph", "matrix", "dgCMatrix")))
         stop("Object of correct type\n")
 
