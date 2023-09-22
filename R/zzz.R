@@ -1,75 +1,42 @@
+# in a package namespace:
+.onLoad <- function(libname=NULL, pkgname) {
 
-.onAttach<-function(libname, pkgname) {
+    ## if(("graph" %in% (.packages())) || ("RBGL" %in% (.packages()))) {
+    ##     cat(sprintf("NOTICE: The graph and/or RBGL package is loaded. This may cause confusion because graph/RBGL and gRbase packages\n"))
+    ##     cat(sprintf("contains (a few) functions with the same name, but the graph function applies to graphNEL objects\n"))
+    ##     cat(sprintf("while the gRbase function applies to igraph objects or adjacency matrices\n"))
+    ##     cat(sprintf("The functions in question include: addEdge, adj, connComp, edges, nodes, removeEdge, subGraph\n"))
+    ##     cat(sprintf("Please ensure to call the right function by graph::edges and gRbase::edges etc\n"))
+    ## }
 
-    ## package startup check
-    toinstall=c(
-        "graph",
-        "Rgraphviz",
-        "RBGL"
-    )
-    
-    already_installed <- sapply(toinstall, function(pkg)
-        requireNamespace(pkg, quietly=TRUE))
-
-    if (any(!already_installed)){
-        packageStartupMessage("Need to install the following package(s): ",
-                              toString(toinstall[!already_installed]), "\n")
-    }
-    
-    ## install if needed
-    if(!base::all(already_installed)){
-        if (!requireNamespace("BiocManager", quietly=TRUE))
-            install.packages("BiocManager")
-        BiocManager::install(toinstall[!already_installed], dependencies=TRUE)
-    }
 }
 
 
+## .onAttach<-function(libname, pkgname) {
 
-    ## previously installed
-    ## already_installed=toinstall %in% utils::installed.packages()[,1]
-    ## cat(toString(already_installed), "\n")
-    ## cat(toString(toinstall[!already_installed]), "\n")
+##     ## ## package startup check
+##     ## toinstall=c(
+##     ##     "graph",
+##     ##     "Rgraphviz",
+##     ##     "RBGL"
+##     ## )
+    
+##     ## already_installed <- sapply(toinstall, function(pkg)
+##     ##     requireNamespace(pkg, quietly=TRUE))
 
-
-## .onLoad <- function(libname, pkgname){
-
-   ##  ow <- options(warn=-1)
-   ##  pkg <- c("Rgraphviz", "graph", "RBGL")
-   ##  ##out <- sapply(pkg, requireNamespace, quietly=TRUE)
-   ##  out <- sapply(pkg, function(p) requireNamespace(p, quietly=TRUE))
-   ##  if (any(!out)){
-   ##      packageStartupMessage(paste0("Required packages from Bioconductor are not installed: ",
-   ##                 toString(pkg[!out])), "\n")
-   ##      packageStartupMessage("Please execute these lines and re-install gRbase again:\n")
-   ##      packageStartupMessage('
-   ##      source("https://bioconductor.org/biocLite.R");
-   ##      biocLite(c("graph", "RBGL", "Rgraphviz"))
-   ##      \n')        
-   ##  } else {
-   ##      packageStartupMessage("You are good to go\n")
-   ##  }
-   ## options(ow)
-## }
-
-
-
-## .onAttach <- function(libname, pkgname){
-##     ow <- options(warn=-1)
-##     pkg <- c("Rgraphviz", "graph", "RBGL")
-##     ##out <- sapply(pkg, requireNamespace, quietly=TRUE)
-##     out <- sapply(pkg, function(p) requireNamespace(p, quietly=TRUE))
-##     if (any(!out)){
-##         msg <- paste0("Required packages from Bioconductor are not installed: ",
-##                       toString(pkg[!out]), "\n",
-##                       "Please execute these lines and re-install gRbase again:\n",
-##                       'source("https://bioconductor.org/biocLite.R");',
-##                       'biocLite(c("graph", "RBGL", "Rgraphviz")) \n')
-##         packageStartupMessage(msg)        
-##     }
-##     ##else {
-##     ##    packageStartupMessage("You are good to go\n")
-##     ##}
-##    options(ow)
+##     ## if (any(!already_installed)){
+##     ##     packageStartupMessage("Need to install the following package(s): ",
+##     ##                           toString(toinstall[!already_installed]), "\n")
+##     ## }
+    
+##     ## ## install if needed
+##     ## if(!base::all(already_installed)){
+##     ##     if (!requireNamespace("BiocManager", quietly=TRUE))
+##     ##         install.packages("BiocManager")
+##     ##     BiocManager::install(toinstall[!already_installed], dependencies=TRUE)
+##     ## }
 
 ## }
+
+
+
