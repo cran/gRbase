@@ -14,8 +14,13 @@ prettyDate <- format(Sys.Date())
 library(gRbase)
 options("width"=100, "digits"=4)
 options(useFancyQuotes="UTF-8")
-#chk = 'markup'
-chk = "hide"
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  chk = "markup"
+)
+chk = "markup"
+options("digits"=3)
 
 ## -------------------------------------------------------------------------------------------------
 hec <- c(32, 53, 11, 50, 10, 25, 36, 66, 9, 34, 5, 29) 
@@ -27,8 +32,8 @@ hec
 
 ## -------------------------------------------------------------------------------------------------
 ##flat <- function(x) {ftable(x, row.vars=1)}
-flat <- function(x, n=4) {as.data.frame.table(x) %>% head(n)}
-hec %>% flat
+flat <- function(x, n=4) {as.data.frame.table(x) |> head(n)}
+hec |> flat()
 
 ## -------------------------------------------------------------------------------------------------
 is.named.array(hec)
@@ -41,14 +46,14 @@ z4 <- tabNew(c("Hair", "Eye", "Sex"), levels=dn, values=counts)
 
 ## -------------------------------------------------------------------------------------------------
 z5 <- tabNew(~Hair:Eye:Sex, levels=c(2, 3, 2), values = counts)
-dimnames(z5) %>% str
+dimnames(z5) |> str()
 
 ## -------------------------------------------------------------------------------------------------
 z6 <- tabNew(~Hair:Eye:Sex, levels=c(2, 3, 2), values=counts, normalize="first")
-z6 %>% flat
+z6 |> flat()
 
 ## -------------------------------------------------------------------------------------------------
-tabNormalize(z5, "first") %>% flat
+tabNormalize(z5, "first") |> flat()
 
 ## ----results=chk----------------------------------------------------------------------------------
 tabSlice(hec, slice=list(Eye=c("Blue", "Hazel"), Sex="Female"))
@@ -67,8 +72,8 @@ t2 <- tabSlice(hec, slice=list(Hair=1, Sex="Female"), as.array=TRUE); t2
 t3 <- tabSlice(hec, slice=list(Hair=1, Sex="Female"), drop=FALSE); t3
 
 ## -------------------------------------------------------------------------------------------------
-t2 %>% flat
-t3 %>% flat
+t2 |> flat()
+t3 |> flat()
 
 ## -------------------------------------------------------------------------------------------------
 he <- tabMarg(hec, c("Hair", "Eye"))
@@ -97,7 +102,7 @@ he %a^% extra.dim
 (he %a^% extra.dim) %a_% c("Hair", "Eye")
 
 ## -------------------------------------------------------------------------------------------------
-tabPerm(hec, ~Eye:Sex:Hair) %>% flat 
+tabPerm(hec, ~Eye:Sex:Hair) |> flat()
 
 ## ----results=chk----------------------------------------------------------------------------------
 tabPerm(hec, c("Eye", "Sex", "Hair"))
@@ -161,11 +166,11 @@ s_r <- tabNew(~sprinkler:rain, levels = lev, values = c(.01, .99, .4, .6))
 w_sr <- tabNew( ~wet:sprinkler:rain, levels=lev, 
              values=c(.99, .01, .8, .2, .9, .1, 0, 1))
 r 
-s_r  %>% flat
-w_sr %>% flat
+s_r  |> flat()
+w_sr |> flat()
 
 ## -------------------------------------------------------------------------------------------------
-joint <- tabProd(r, s_r, w_sr); joint %>% flat
+joint <- tabProd(r, s_r, w_sr); joint |> flat()
 
 ## -------------------------------------------------------------------------------------------------
 tabDist(joint, marg=~rain, cond=~wet)
@@ -184,7 +189,7 @@ tabDist(x, marg=~rain)
 
 ## -------------------------------------------------------------------------------------------------
 data(lizard, package="gRbase")
-lizard %>% flat
+lizard |> flat()
 
 ## -------------------------------------------------------------------------------------------------
 myips <- function(indata, glist){
@@ -211,11 +216,11 @@ glist <- list(c("species", "diam"),c("species", "height"),c("diam", "height"))
 
 fm1 <- myips(lizard, glist)
 fm1$pearson
-fm1$fit %>% flat
+fm1$fit |> flat()
 
 fm2 <- loglin(lizard, glist, fit=T)
 fm2$pearson
-fm2$fit %>% flat
+fm2$fit |> flat()
 
 ## -------------------------------------------------------------------------------------------------
 hec
@@ -253,18 +258,18 @@ head( fact_grid( c(2, 3, 2) ), 6 )
 head( expand.grid(list(1:2, 1:3, 1:2)), 6 )
 
 ## -------------------------------------------------------------------------------------------------
-hec[, 2:3, ]  %>% flat  ## A 2 x 2 x 2 array
+hec[, 2:3, ]  |> flat()  ## A 2 x 2 x 2 array
 hec[1, , 1]             ## A vector
 hec[1, , 1, drop=FALSE] ## A 1 x 3 x 1 array
 
 ## ----results=chk----------------------------------------------------------------------------------
-do.call("[", c(list(hec), list(TRUE, 2:3, TRUE)))  %>% flat
+do.call("[", c(list(hec), list(TRUE, 2:3, TRUE)))  |> flat()
 do.call("[", c(list(hec), list(1, TRUE, 1))) 
 do.call("[", c(list(hec), list(1, TRUE, 1), drop=FALSE)) 
 
 ## ----results=chk----------------------------------------------------------------------------------
-tabSlicePrim(hec, slice=list(TRUE, 2:3, TRUE))  %>% flat
-tabSlice(hec, slice=list(c(2, 3)), margin=2) %>% flat
+tabSlicePrim(hec, slice=list(TRUE, 2:3, TRUE))  |> flat()
+tabSlice(hec, slice=list(c(2, 3)), margin=2) |> flat()
 
 tabSlicePrim(hec, slice=list(1, TRUE, 1))  
 tabSlice(hec, slice=list(1, 1), margin=c(1, 3)) 

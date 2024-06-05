@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Array operations with the gRbase package</title>
+<style type="text/css">
+/**
+ * Prism.s theme ported from highlight.js's xcode style
+ */
+pre code {
+  padding: 1em;
+}
+.token.comment {
+  color: #007400;
+}
+.token.punctuation {
+  color: #999;
+}
+.token.tag,
+.token.selector {
+  color: #aa0d91;
+}
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol {
+  color: #1c00cf;
+}
+.token.property,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin {
+  color: #c41a16;
+}
+.token.inserted {
+  background-color: #ccffd8;
+}
+.token.deleted {
+  background-color: #ffebe9;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #836c28;
+}
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #5c2699;
+}
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+</style>
+<style type="text/css">
+body {
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+body, .footnotes, code { font-size: .9em; }
+li li { font-size: .95em; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+pre, img { max-width: 100%; }
+pre, pre:hover {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+pre code {
+  display: block;
+  overflow-x: auto;
+}
+code { font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace; }
+:not(pre) > code, code[class] { background-color: #F8F8F8; }
+code.language-undefined, pre > code:not([class]) {
+  background-color: inherit;
+  border: 1px solid #eee;
+}
+table {
+  margin: auto;
+  border-top: 1px solid #666;
+}
+table thead th { border-bottom: 1px solid #ddd; }
+th, td { padding: 5px; }
+thead, tfoot, tr:nth-child(even) { background: #eee; }
+blockquote {
+  color: #666;
+  margin: 0;
+  padding-left: 1em;
+  border-left: 0.5em solid #eee;
+}
+hr, .footnotes::before { border: 1px dashed #ddd; }
+.frontmatter { text-align: center; }
+#TOC .numbered li { list-style: none; }
+#TOC .numbered { padding-left: 0; }
+#TOC .numbered ul { padding-left: 1em; }
+table, .body h2 { border-bottom: 1px solid #666; }
+.body .appendix, .appendix ~ h2 { border-bottom-style: dashed; }
+.footnote-ref a::before { content: "["; }
+.footnote-ref a::after { content: "]"; }
+section.footnotes::before {
+  content: "";
+  display: block;
+  max-width: 20em;
+}
+
+@media print {
+  body {
+    font-size: 12pt;
+    max-width: 100%;
+  }
+  tr, img { page-break-inside: avoid; }
+}
+@media only screen and (min-width: 992px) {
+  pre { white-space: pre; }
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+</head>
+<body>
+<div class="frontmatter">
+<div class="title"><h1>Array operations with the gRbase package</h1></div>
+<div class="author"><h2>Søren Højsgaard</h2></div>
+<div class="date"><h3></h3></div>
+</div>
+<div class="body">
+<h1 id="introduction">Introduction</h1>
+<p>This note describes some operations on arrays in R. These operations
+have been implemented to facilitate implementation of graphical models
+and Bayesian networks in R.</p>
+<h2 id="arrays-tables-in-r">Arrays/tables in R</h2>
+<p>(#sec:arrays)</p>
+<p>The documentation of R states the following about arrays:</p>
+<p>\begin{quote} \em An array in R can have one, two or more dimensions. It is simply a vector which is stored with additional attributes giving the dimensions (attribute &quot;dim&quot;) and optionally names for those dimensions (attribute &quot;dimnames&quot;).  A two-dimensional array is the same thing as a matrix.  One-dimensional arrays often look like vectors, but may be handled differently by some functions. \end{quote}</p>
+<h2 id="cross-classified-data-contingency-tables">Cross classified data - contingency tables</h2>
+<p>(#sec:new)</p>
+<p>Arrays appear for example in connection with cross classified data. The array
+\code{hec} below is an excerpt of the \code{HairEyeColor} array in R:</p>
+<pre><code class="language-r">hec &lt;- c(32, 53, 11, 50, 10, 25, 36, 66, 9, 34, 5, 29) 
+dim(hec) &lt;- c(2, 3, 2)
+dimnames(hec) &lt;- list(Hair = c(&quot;Black&quot;, &quot;Brown&quot;), 
+                      Eye = c(&quot;Brown&quot;, &quot;Blue&quot;, &quot;Hazel&quot;), 
+                      Sex = c(&quot;Male&quot;, &quot;Female&quot;))
+hec
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    32   11    10
+#&gt;   Brown    53   50    25
+#&gt; 
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    36    9     5
+#&gt;   Brown    66   34    29
+</code></pre>
+<p>Above, \code{hec} is an array because it has a \code{dim} attribute. Moreover,
+\code{hec} also has a \code{dimnames} attribute naming the levels of each
+dimension. Notice that each dimension is given a name.</p>
+<p>Printing arrays can take up a lot of space.  Alternative views on an
+array can be obtained with \code{ftable()} or by converting the array
+to a dataframe with \code{as.data.frame.table()}. We shall do so in the following.</p>
+<pre><code class="language-r">##flat &lt;- function(x) {ftable(x, row.vars=1)}
+flat &lt;- function(x, n=4) {as.data.frame.table(x) |&gt; head(n)}
+hec |&gt; flat()
+#&gt;    Hair   Eye  Sex Freq
+#&gt; 1 Black Brown Male   32
+#&gt; 2 Brown Brown Male   53
+#&gt; 3 Black  Blue Male   11
+#&gt; 4 Brown  Blue Male   50
+</code></pre>
+<p>An array with named dimensions is in this package called a <em>named array</em>.
+The functionality described below relies heavily on arrays having named dimensions.
+A check for an object being a named array is provided by
+\rr{is.named.array()}</p>
+<pre><code class="language-r">is.named.array(hec)
+#&gt; [1] TRUE
+</code></pre>
+<h2 id="defining-arrays">Defining arrays</h2>
+<p>Another way is to use \rr{tabNew()} from \grbase. This function is flexible wrt the input; for example:</p>
+<pre><code class="language-r">dn &lt;- list(Hair=c(&quot;Black&quot;, &quot;Brown&quot;), Eye=~Brown:Blue:Hazel, Sex=~Male:Female)
+counts &lt;- c(32, 53, 11, 50, 10, 25, 36, 66, 9, 34, 5, 29)
+z3 &lt;- tabNew(~Hair:Eye:Sex, levels=dn, value=counts) 
+z4 &lt;- tabNew(c(&quot;Hair&quot;, &quot;Eye&quot;, &quot;Sex&quot;), levels=dn, values=counts)
+</code></pre>
+<p>Notice that the levels list (\code{dn} above) when used in \rr{tabNew()}
+is allowed to contain superfluous elements. Default
+\code{dimnames} are generated with</p>
+<pre><code class="language-r">z5 &lt;- tabNew(~Hair:Eye:Sex, levels=c(2, 3, 2), values = counts)
+dimnames(z5) |&gt; str()
+#&gt; List of 3
+#&gt;  $ Hair: chr [1:2] &quot;1&quot; &quot;2&quot;
+#&gt;  $ Eye : chr [1:3] &quot;1&quot; &quot;2&quot; &quot;3&quot;
+#&gt;  $ Sex : chr [1:2] &quot;1&quot; &quot;2&quot;
+</code></pre>
+<p>Using \rr{tabNew}, arrays can be normalized to sum to one in two ways:</p>
+<ol>
+<li>Normalization can be over the first variable for <em>each</em>
+configuration of all other variables and 2) over all configurations. For
+example:</li>
+</ol>
+<pre><code class="language-r">z6 &lt;- tabNew(~Hair:Eye:Sex, levels=c(2, 3, 2), values=counts, normalize=&quot;first&quot;)
+z6 |&gt; flat()
+#&gt;   Hair Eye Sex  Freq
+#&gt; 1    1   1   1 0.376
+#&gt; 2    2   1   1 0.624
+#&gt; 3    1   2   1 0.180
+#&gt; 4    2   2   1 0.820
+</code></pre>
+<h1 id="operations-on-arrays">Operations on arrays</h1>
+<p>{#sec:operations-arrays}</p>
+<p>In the following we shall denote the dimnames
+(or variables) of the array \code{hec} by \(H\), \(E\) and \(S\) and we let \((h,e,s)\)
+denote a configuration of these variables. The contingency table above
+shall be denoted by \(T_{HES}\) and we shall refer to the
+\((h,e,s)\)-entry of \(T_{HES}\) as \(T_{HES}(h,e,s)\).</p>
+<h2 id="normalizing-an-array">Normalizing an array</h2>
+<p>{#sec:numarlizing-an-array}</p>
+<p>Normalize an array with  \rr{tabNormalize()}
+Entries of an array can be normalized to sum to one in two ways:</p>
+<ol>
+<li>Normalization can be over the first variable for <em>each</em>
+configuration of all other variables and 2) over all configurations. For
+example:</li>
+</ol>
+<pre><code class="language-r">tabNormalize(z5, &quot;first&quot;) |&gt; flat()
+#&gt;   Hair Eye Sex  Freq
+#&gt; 1    1   1   1 0.376
+#&gt; 2    2   1   1 0.624
+#&gt; 3    1   2   1 0.180
+#&gt; 4    2   2   1 0.820
+</code></pre>
+<h2 id="subsetting-an-array-slicing">Subsetting an array – slicing</h2>
+<p>{#sec:subsetting-an-array}</p>
+<p>We can subset arrays (this will also be called ``slicing’’) in
+different ways. Notice that the result is not necessarily an
+array. Slicing can be done using standard R code or using \rr{tabSlice}.
+The virtue of \rr{tabSlice} comes from the flexibility when
+specifying the slice:</p>
+<p>The following leads from the original \(2\times 3 \times 2\)
+array to a \(2 \times 2\)
+array by cutting away the \code{Sex=Male} and \code{Eye=Brown} slice of the array:</p>
+<pre><code class="language-r">tabSlice(hec, slice=list(Eye=c(&quot;Blue&quot;, &quot;Hazel&quot;), Sex=&quot;Female&quot;))
+#&gt;        Eye
+#&gt; Hair    Blue Hazel
+#&gt;   Black    9     5
+#&gt;   Brown   34    29
+## Notice: levels can be written as numerics
+## tabSlice(hec, slice=list(Eye=2:3, Sex=&quot;Female&quot;))
+</code></pre>
+<p>We may also regard the result above as a \(2 \times 2 \times 1\) array:</p>
+<pre><code class="language-r">tabSlice(hec, slice=list(Eye=c(&quot;Blue&quot;, &quot;Hazel&quot;), Sex=&quot;Female&quot;), drop=FALSE)
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Blue Hazel
+#&gt;   Black    9     5
+#&gt;   Brown   34    29
+</code></pre>
+<p>If slicing leads to a one dimensional array, the output will by
+default not be an array but a vector (without a dim attribute). However,
+the result can be forced to be a 1-dimensional array:</p>
+<pre><code class="language-r">## A vector:
+t1 &lt;- tabSlice(hec, slice=list(Hair=1, Sex=&quot;Female&quot;)); t1
+#&gt; Brown  Blue Hazel 
+#&gt;    36     9     5
+## A 1-dimensional array:
+t2 &lt;- tabSlice(hec, slice=list(Hair=1, Sex=&quot;Female&quot;), as.array=TRUE); t2 
+#&gt; Eye
+#&gt; Brown  Blue Hazel 
+#&gt;    36     9     5
+## A higher dimensional array (in which some dimensions only have one level)
+t3 &lt;- tabSlice(hec, slice=list(Hair=1, Sex=&quot;Female&quot;), drop=FALSE); t3
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    36    9     5
+</code></pre>
+<p>The difference between the last two forms can be clarified:</p>
+<pre><code class="language-r">t2 |&gt; flat()
+#&gt;     Eye Freq
+#&gt; 1 Brown   36
+#&gt; 2  Blue    9
+#&gt; 3 Hazel    5
+t3 |&gt; flat()
+#&gt;    Hair   Eye    Sex Freq
+#&gt; 1 Black Brown Female   36
+#&gt; 2 Black  Blue Female    9
+#&gt; 3 Black Hazel Female    5
+</code></pre>
+<h2 id="collapsing-and-inflating-arrays">Collapsing  and inflating arrays</h2>
+<p>{#sec:collapsing-arrays}</p>
+<p>Collapsing: The \(HE\)–marginal array \(T_{HE}\) of \(T_{HES}\) is  the array with
+values
+\begin{displaymath} T_{HE}(h,e) = \sum_s T_{HES}(h,e,s) \end{displaymath}
+Inflating: The ``opposite’’ operation is to extend an array. For example, we can
+extend \(T_{HE}\) to have a third dimension, e.g.\ \code{Sex}. That is
+`1p\begin{displaymath}
+\tilde T_{SHE}(s,h,e) = T_{HE}(h,e)
+\end{displaymath}1p`
+so `1p(\tilde T_{SHE}(s,h,e))1p` is constant as a function of `1p(s)1p`.</p>
+<p>With \grbase\ we can collapse arrays with\footnote{FIXME: Should allow for abbreviations in
+formula and character vector specifications.}:</p>
+<pre><code class="language-r">he &lt;- tabMarg(hec, c(&quot;Hair&quot;, &quot;Eye&quot;))
+he
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    68   20    15
+#&gt;   Brown   119   84    54
+</code></pre>
+<pre><code class="language-r">## Alternatives
+tabMarg(hec, ~Hair:Eye)
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    68   20    15
+#&gt;   Brown   119   84    54
+tabMarg(hec, c(1, 2))
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    68   20    15
+#&gt;   Brown   119   84    54
+hec %a_% ~Hair:Eye
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    68   20    15
+#&gt;   Brown   119   84    54
+</code></pre>
+<p>Notice that collapsing is a projection in the sense that applying the
+operation again does not change anything:</p>
+<pre><code class="language-r">he1 &lt;- tabMarg(hec, c(&quot;Hair&quot;, &quot;Eye&quot;))
+he2 &lt;- tabMarg(he1, c(&quot;Hair&quot;, &quot;Eye&quot;))
+tabEqual(he1, he2)
+#&gt; [1] TRUE
+</code></pre>
+<p>Expand an array by adding additional dimensions with \rr{tabExpand()}:</p>
+<pre><code class="language-r">extra.dim &lt;- list(Sex=c(&quot;Male&quot;, &quot;Female&quot;))
+tabExpand(he, extra.dim) 
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Hair
+#&gt; Eye     Black Brown
+#&gt;   Brown    68   119
+#&gt;   Blue     20    84
+#&gt;   Hazel    15    54
+#&gt; 
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Hair
+#&gt; Eye     Black Brown
+#&gt;   Brown    68   119
+#&gt;   Blue     20    84
+#&gt;   Hazel    15    54
+</code></pre>
+<pre><code class="language-r">## Alternatives
+he %a^% extra.dim
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Hair
+#&gt; Eye     Black Brown
+#&gt;   Brown    68   119
+#&gt;   Blue     20    84
+#&gt;   Hazel    15    54
+#&gt; 
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Hair
+#&gt; Eye     Black Brown
+#&gt;   Brown    68   119
+#&gt;   Blue     20    84
+#&gt;   Hazel    15    54
+</code></pre>
+<p>Notice that expanding and collapsing brings us back to where we started:</p>
+<pre><code class="language-r">(he %a^% extra.dim) %a_% c(&quot;Hair&quot;, &quot;Eye&quot;)
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black   136   40    30
+#&gt;   Brown   238  168   108
+</code></pre>
+<h2 id="permuting-an-array">Permuting an array</h2>
+<p>{#sec:permuting-an-array}</p>
+<p>A reorganization of the table can be made with \rr{tabPerm} (similar
+to \code{aperm()}), but \rr{tabPerm} allows for a formula and for variable abbreviation:</p>
+<pre><code class="language-r">tabPerm(hec, ~Eye:Sex:Hair) |&gt; flat()
+#&gt;     Eye    Sex  Hair Freq
+#&gt; 1 Brown   Male Black   32
+#&gt; 2  Blue   Male Black   11
+#&gt; 3 Hazel   Male Black   10
+#&gt; 4 Brown Female Black   36
+</code></pre>
+<p>Alternative forms (the first two also works for \code{aperm}):</p>
+<pre><code class="language-r">tabPerm(hec, c(&quot;Eye&quot;, &quot;Sex&quot;, &quot;Hair&quot;))
+#&gt; , , Hair = Black
+#&gt; 
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown   32     36
+#&gt;   Blue    11      9
+#&gt;   Hazel   10      5
+#&gt; 
+#&gt; , , Hair = Brown
+#&gt; 
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown   53     66
+#&gt;   Blue    50     34
+#&gt;   Hazel   25     29
+tabPerm(hec, c(2, 3, 1)) 
+#&gt; , , Hair = Black
+#&gt; 
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown   32     36
+#&gt;   Blue    11      9
+#&gt;   Hazel   10      5
+#&gt; 
+#&gt; , , Hair = Brown
+#&gt; 
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown   53     66
+#&gt;   Blue    50     34
+#&gt;   Hazel   25     29
+tabPerm(hec, ~Ey:Se:Ha) 
+#&gt; , , Hair = Black
+#&gt; 
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown   32     36
+#&gt;   Blue    11      9
+#&gt;   Hazel   10      5
+#&gt; 
+#&gt; , , Hair = Brown
+#&gt; 
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown   53     66
+#&gt;   Blue    50     34
+#&gt;   Hazel   25     29
+tabPerm(hec, c(&quot;Ey&quot;, &quot;Se&quot;, &quot;Ha&quot;))
+#&gt; , , Hair = Black
+#&gt; 
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown   32     36
+#&gt;   Blue    11      9
+#&gt;   Hazel   10      5
+#&gt; 
+#&gt; , , Hair = Brown
+#&gt; 
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown   53     66
+#&gt;   Blue    50     34
+#&gt;   Hazel   25     29
+</code></pre>
+<h2 id="equality">Equality</h2>
+<p>{#sec:equality}</p>
+<p>Two arrays are defined to be identical 1) if they have the same dimnames
+and 2) if, possibly after a permutation, all values are identical (up to
+a small numerical difference):</p>
+<pre><code class="language-r">hec2 &lt;- tabPerm(hec, 3:1)
+tabEqual(hec, hec2)
+#&gt; [1] TRUE
+</code></pre>
+<pre><code class="language-r">## Alternative
+hec %a==% hec2
+#&gt; [1] TRUE
+</code></pre>
+<h2 id="aligning">Aligning</h2>
+<p>{#sec:aligning}</p>
+<p>We can align one array according to the ordering of another:</p>
+<pre><code class="language-r">hec2 &lt;- tabPerm(hec, 3:1)
+tabAlign(hec2, hec)
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    32   11    10
+#&gt;   Brown    53   50    25
+#&gt; 
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    36    9     5
+#&gt;   Brown    66   34    29
+</code></pre>
+<pre><code class="language-r">## Alternative:
+tabAlign(hec2, dimnames(hec))
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    32   11    10
+#&gt;   Brown    53   50    25
+#&gt; 
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    36    9     5
+#&gt;   Brown    66   34    29
+</code></pre>
+<p>%## Operations on two or more arrays
+%{#sec:oper-two-arrays}</p>
+<h2 id="multiplication-addition-etc">Multiplication, addition etc:  \(+\), \(-\), \(*\), \(/\)</h2>
+<p>{#sec:mult-addt-etc}</p>
+<p>The product of two arrays \(T_{HE}\) and \(T_{HS}\) is defined to be the array
+\(\tilde T_{HES}\) with entries
+\begin{displaymath} \tilde T_{HES}(h,e,s)= T_{HE}(h,e) + T_{HS}(h,s) \end{displaymath}</p>
+<p>The sum, difference and quotient is defined similarly: This is done
+with \rr{tabProd()}, \rr{tabAdd()}, \rr{tabDiff()} and \rr{tabDiv()}:</p>
+<pre><code class="language-r">hs &lt;- tabMarg(hec, ~Hair:Eye)
+tabMult(he, hs)
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black  4624  400   225
+#&gt;   Brown 14161 7056  2916
+</code></pre>
+<p>Available operations:</p>
+<pre><code class="language-r">tabAdd(he, hs) 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black   136   40    30
+#&gt;   Brown   238  168   108
+tabSubt(he, hs)
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black     0    0     0
+#&gt;   Brown     0    0     0
+tabMult(he, hs)
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black  4624  400   225
+#&gt;   Brown 14161 7056  2916
+tabDiv(he, hs) 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black     1    1     1
+#&gt;   Brown     1    1     1
+tabDiv0(he, hs) ## Convention 0/0 = 0
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black     1    1     1
+#&gt;   Brown     1    1     1
+</code></pre>
+<p>Shortcuts:</p>
+<pre><code class="language-r">## Alternative
+he %a+% hs
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black   136   40    30
+#&gt;   Brown   238  168   108
+he %a-% hs
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black     0    0     0
+#&gt;   Brown     0    0     0
+he %a*% hs
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black  4624  400   225
+#&gt;   Brown 14161 7056  2916
+he %a/% hs
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black     1    1     1
+#&gt;   Brown     1    1     1
+he %a/0% hs ## Convention 0/0 = 0
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black     1    1     1
+#&gt;   Brown     1    1     1
+</code></pre>
+<p>Multiplication and addition of (a list of) multiple arrays is
+accomplished with \rr{tabProd()} and \rr{tabSum()} (much like
+\rr{prod()} and \rr{sum()}):</p>
+<pre><code class="language-r">es &lt;- tabMarg(hec, ~Eye:Sex)
+tabSum(he, hs, es)  
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black   221  101    65
+#&gt;   Brown   323  229   143
+#&gt; 
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black   238   83    64
+#&gt;   Brown   340  211   142
+## tabSum(list(he, hs, es))
+</code></pre>
+<p>%% Lists of arrays are processed with
+%% ```{r results=chk}
+%% tabListAdd(list(he, hs, es))
+%% tabListMult(list(he, hs, es))
+%% @</p>
+<h2 id="an-array-as-a-probability-density">An array as a probability density</h2>
+<p>{#sec:an-array-as}</p>
+<p>If an array consists of non–negative numbers then it may be regarded as an
+(unnormalized) discrete multivariate density. With this view, the following
+examples should be self explanatory:</p>
+<pre><code class="language-r">tabDist(hec, marg=~Hair:Eye)
+#&gt;        Eye
+#&gt; Hair    Brown   Blue  Hazel
+#&gt;   Black 0.189 0.0556 0.0417
+#&gt;   Brown 0.331 0.2333 0.1500
+tabDist(hec, cond=~Sex) 
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown   Blue  Hazel
+#&gt;   Black 0.177 0.0608 0.0552
+#&gt;   Brown 0.293 0.2762 0.1381
+#&gt; 
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown   Blue  Hazel
+#&gt;   Black 0.201 0.0503 0.0279
+#&gt;   Brown 0.369 0.1899 0.1620
+tabDist(hec, marg=~Hair, cond=~Sex) 
+#&gt;        Sex
+#&gt; Hair     Male Female
+#&gt;   Black 0.293  0.279
+#&gt;   Brown 0.707  0.721
+</code></pre>
+<h2 id="miscellaneous">Miscellaneous</h2>
+<p>{#sec:miscellaneous-1}</p>
+<p>Multiply values in a slice by some number and all other values by
+another number:</p>
+<pre><code class="language-r">tabSliceMult(es, list(Sex=&quot;Female&quot;), val=10, comp=0)
+#&gt;        Sex
+#&gt; Eye     Male Female
+#&gt;   Brown    0   1020
+#&gt;   Blue     0    430
+#&gt;   Hazel    0    340
+</code></pre>
+<h1 id="examples">Examples</h1>
+<p>{#sec:examples}</p>
+<h2 id="a-bayesian-network">A Bayesian network</h2>
+<p>{#sec:comp-with-arrays}</p>
+<p>A classical example of a Bayesian network is the ``sprinkler
+example’’, see e.g.<br />
+(<a href="https://en.wikipedia.org/wiki/Bayesian_network">https://en.wikipedia.org/wiki/Bayesian_network</a>):
+\begin{quote} \em Suppose that there are two events which could cause grass to be wet: either the sprinkler is on or it is raining. Also, suppose that the rain has a direct effect on the use of the sprinkler (namely that when it rains, the sprinkler is usually not turned on). Then the situation can be modeled with a Bayesian network. \end{quote}</p>
+<p>We specify conditional probabilities \(p&amp;reg;\), \(p(s|r)\) and \(p(w|s,r)\)
+as follows
+(notice that the vertical conditioning bar ($|$) is replaced by the
+horizontal underscore:</p>
+<pre><code class="language-r">yn &lt;- c(&quot;y&quot;,&quot;n&quot;)
+lev &lt;- list(rain=yn, sprinkler=yn, wet=yn)
+r &lt;- tabNew(~rain, levels=lev, values=c(.2, .8))
+s_r &lt;- tabNew(~sprinkler:rain, levels = lev, values = c(.01, .99, .4, .6))
+w_sr &lt;- tabNew( ~wet:sprinkler:rain, levels=lev, 
+             values=c(.99, .01, .8, .2, .9, .1, 0, 1))
+r 
+#&gt; rain
+#&gt;   y   n 
+#&gt; 0.2 0.8
+s_r  |&gt; flat()
+#&gt;   sprinkler rain Freq
+#&gt; 1         y    y 0.01
+#&gt; 2         n    y 0.99
+#&gt; 3         y    n 0.40
+#&gt; 4         n    n 0.60
+w_sr |&gt; flat()
+#&gt;   wet sprinkler rain Freq
+#&gt; 1   y         y    y 0.99
+#&gt; 2   n         y    y 0.01
+#&gt; 3   y         n    y 0.80
+#&gt; 4   n         n    y 0.20
+</code></pre>
+<p>The joint distribution \(p(r,s,w)=p&amp;reg;p(s|r)p(w|s,r)\) can be obtained
+with \rr{tabProd()}:
+ways:</p>
+<pre><code class="language-r">joint &lt;- tabProd(r, s_r, w_sr); joint |&gt; flat()
+#&gt;   wet sprinkler rain    Freq
+#&gt; 1   y         y    y 0.00198
+#&gt; 2   n         y    y 0.00002
+#&gt; 3   y         n    y 0.15840
+#&gt; 4   n         n    y 0.03960
+</code></pre>
+<p>What is the probability that it rains given that the grass is wet? We
+find \(p(r,w)=\sum_s p(r,s,w)\) and then \(p(r|w)=p(r,w)/p(w)\). Can be done in various ways: with \rr{tabDist()}</p>
+<pre><code class="language-r">tabDist(joint, marg=~rain, cond=~wet)
+#&gt;     wet
+#&gt; rain     y      n
+#&gt;    y 0.358 0.0718
+#&gt;    n 0.642 0.9282
+</code></pre>
+<pre><code class="language-r">## Alternative:
+rw &lt;- tabMarg(joint, ~rain + wet)
+tabDiv(rw, tabMarg(rw, ~wet))
+## or
+rw %a/% (rw %a_% ~wet)
+</code></pre>
+<pre><code class="language-r">## Alternative:
+x &lt;- tabSliceMult(rw, slice=list(wet=&quot;y&quot;)); x
+#&gt;     wet
+#&gt; rain     y n
+#&gt;    y 0.160 0
+#&gt;    n 0.288 0
+tabDist(x, marg=~rain)
+#&gt; rain
+#&gt;     y     n 
+#&gt; 0.358 0.642
+</code></pre>
+<h2 id="iterative-proportional-scaling-ips">Iterative Proportional Scaling (IPS)</h2>
+<p>{#sec:ips}</p>
+<p>We consider the \(3\)–way \code{lizard} data from \grbase:</p>
+<pre><code class="language-r">data(lizard, package=&quot;gRbase&quot;)
+lizard |&gt; flat()
+#&gt;   diam height species Freq
+#&gt; 1  &lt;=4  &gt;4.75   anoli   32
+#&gt; 2   &gt;4  &gt;4.75   anoli   11
+#&gt; 3  &lt;=4 &lt;=4.75   anoli   86
+#&gt; 4   &gt;4 &lt;=4.75   anoli   35
+</code></pre>
+<p>Consider the two factor log–linear model for the \verb’lizard’
+data. Under the model the expected counts have the form
+\begin{displaymath} \log m(d,h,s)= a_1(d,h)+a_2(d,s)+a_3(h,s) \end{displaymath}
+If we let \(n(d,h,s)\) denote the observed counts, the likelihood
+equations are: Find \(m(d,h,s)\) such that
+\begin{displaymath} m(d,h)=n(d,h), \quad m(d,s)=n(d,s), \quad m(h,s)=n(h,s) \end{displaymath}
+where \(m(d,h)=\sum_s m(d,h.s)\) etc.
+The updates are as follows: For the first term we have</p>
+<p>\begin{displaymath} m(d,h,s) \leftarrow m(d,h,s) \frac{n(d,h)}{m(d,h)} %  , \mbox{ where } %  m(d,h) = \sum_s m(d,h,s) \end{displaymath}
+After iterating the updates will not change and we will have equality:
+$  m(d,h,s) = m(d,h,s) \frac{n(d,h)}{m(d,h)}$ and summing over \(s\)
+shows that the equation \(m(d,h)=n(d,h)\) is satisfied.</p>
+<p>A rudimentary implementation of iterative proportional scaling for
+log–linear models is straight forward:</p>
+<pre><code class="language-r">myips &lt;- function(indata, glist){
+    fit   &lt;- indata
+    fit[] &lt;-  1
+    ## List of sufficient marginal tables
+    md    &lt;- lapply(glist, function(g) tabMarg(indata, g))
+
+    for (i in 1:4){
+        for (j in seq_along(glist)){
+            mf  &lt;- tabMarg(fit, glist[[j]])
+            # adj &lt;- tabDiv( md[[ j ]], mf)
+            # fit &lt;- tabMult( fit, adj )
+            ## or
+            adj &lt;- md[[ j ]] %a/% mf
+            fit &lt;- fit %a*% adj
+        }
+    }
+    pearson &lt;- sum((fit - indata)^2 / fit)
+    list(pearson=pearson, fit=fit)
+}
+
+glist &lt;- list(c(&quot;species&quot;, &quot;diam&quot;),c(&quot;species&quot;, &quot;height&quot;),c(&quot;diam&quot;, &quot;height&quot;))
+
+fm1 &lt;- myips(lizard, glist)
+fm1$pearson
+#&gt; [1] 665
+fm1$fit |&gt; flat()
+#&gt;   species diam height Freq
+#&gt; 1   anoli  &lt;=4  &gt;4.75 32.8
+#&gt; 2    dist  &lt;=4  &gt;4.75 60.2
+#&gt; 3   anoli   &gt;4  &gt;4.75 10.2
+#&gt; 4    dist   &gt;4  &gt;4.75 41.8
+
+fm2 &lt;- loglin(lizard, glist, fit=T)
+#&gt; 4 iterations: deviation 0.00962
+fm2$pearson
+#&gt; [1] 0.151
+fm2$fit |&gt; flat()
+#&gt;   diam height species Freq
+#&gt; 1  &lt;=4  &gt;4.75   anoli 32.8
+#&gt; 2   &gt;4  &gt;4.75   anoli 10.2
+#&gt; 3  &lt;=4 &lt;=4.75   anoli 85.2
+#&gt; 4   &gt;4 &lt;=4.75   anoli 35.8
+</code></pre>
+<h1 id="some-low-level-functions">Some low level functions</h1>
+<p>{#sec:some-low-level}</p>
+<p>For e.g.\ a \(2\times 3 \times 2\) array, the entries are such that the first
+variable varies fastest so the ordering of the cells are \((1,1,1)\),
+\((2,1,1)\), \((1,2,1)\), \((2,2,1)\),$(1,3,1)$ and so on. To find the value
+of such a cell, say,
+\((j,k,l)\) in the array (which is really just a vector), the cell is
+mapped into an entry of a vector.</p>
+<p>For example, cell \((2,3,1)\)
+(\verb|Hair=Brown|, \verb|Eye=Hazel|, \verb|Sex=Male|) must be mapped to
+entry \(4\) in</p>
+<pre><code class="language-r">hec
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    32   11    10
+#&gt;   Brown    53   50    25
+#&gt; 
+#&gt; , , Sex = Female
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    36    9     5
+#&gt;   Brown    66   34    29
+c(hec)
+#&gt;  [1] 32 53 11 50 10 25 36 66  9 34  5 29
+</code></pre>
+<p>For illustration we do:</p>
+<pre><code class="language-r">cell2name &lt;- function(cell, dimnames){
+    unlist(lapply(1:length(cell), function(m) dimnames[[m]][cell[m]]))
+}
+cell2name(c(2,3,1), dimnames(hec))
+#&gt; [1] &quot;Brown&quot; &quot;Hazel&quot; &quot;Male&quot;
+</code></pre>
+<p>\subsection{\code{cell2entry()}, \code{entry2cell()} and \code{next_cell()} }</p>
+<p>The map from a cell to the corresponding
+entry is provided by \rr{cell2entry()}. The reverse operation, going
+from an entry to a cell (which is much less needed) is provided by
+\rr {entry2cell()}.</p>
+<pre><code class="language-r">cell2entry(c(2,3,1), dim=c(2, 3, 2))
+#&gt; [1] 6
+entry2cell(6, dim=c(2, 3, 2))
+#&gt; [1] 2 3 1
+</code></pre>
+<p>Given a cell, say \(i=(2,3,1)\) in a \(2\times 3\times 2\) array we often want to find the next cell in
+the table following the convention that the first factor varies
+fastest, that is \((1,1,2)\). This is provided by
+\rr{next_cell()}.</p>
+<pre><code class="language-r">next_cell(c(2,3,1), dim=c(2, 3, 2))
+#&gt; [1] 1 1 2
+</code></pre>
+<p>\subsection{\code{next_cell_slice()} and \code{slice2entry()}}
+%{#sec:x}</p>
+<p>Given that we look at cells for which for which the index in dimension \(2\) is at level \(3\) (that is
+\verb|Eye=Hazel|), i.e.\ cells of the form \((j,3,l)\). Given such a
+cell, what is then the next cell that also satisfies this
+constraint. This is provided by
+\rr{next_cell_slice()}.\footnote{FIXME: sliceset should be called margin.}</p>
+<pre><code class="language-r">next_cell_slice(c(1,3,1), slice_marg=2, dim=c( 2, 3, 2 ))
+#&gt; [1] 2 3 1
+next_cell_slice(c(2,3,1), slice_marg=2, dim=c( 2, 3, 2 ))
+#&gt; [1] 1 3 2
+</code></pre>
+<p>Given that in dimension \(2\) we look at level \(3\). We want to find
+entries for the cells of the form \((j,3,l)\).\footnote{FIXME:slicecell and
+sliceset should be renamed}</p>
+<pre><code class="language-r">slice2entry(slice_cell=3, slice_marg=2, dim=c( 2, 3, 2 ))
+#&gt; [1]  5  6 11 12
+</code></pre>
+<p>To verify that we indeed get the right cells:</p>
+<pre><code class="language-r">r &lt;- slice2entry(slice_cell=3, slice_marg=2, dim=c( 2, 3, 2 ))
+lapply(lapply(r, entry2cell, c( 2, 3, 2 )),
+       cell2name, dimnames(hec))
+#&gt; [[1]]
+#&gt; [1] &quot;Black&quot; &quot;Hazel&quot; &quot;Male&quot; 
+#&gt; 
+#&gt; [[2]]
+#&gt; [1] &quot;Brown&quot; &quot;Hazel&quot; &quot;Male&quot; 
+#&gt; 
+#&gt; [[3]]
+#&gt; [1] &quot;Black&quot;  &quot;Hazel&quot;  &quot;Female&quot;
+#&gt; 
+#&gt; [[4]]
+#&gt; [1] &quot;Brown&quot;  &quot;Hazel&quot;  &quot;Female&quot;
+</code></pre>
+<p>\subsection{\code{fact_grid()} – Factorial grid}
+{#sec:factgrid}</p>
+<p>Using the operations above we can obtain the combinations of the
+factors as a matrix:</p>
+<pre><code class="language-r">head( fact_grid( c(2, 3, 2) ), 6 )
+#&gt;      [,1] [,2] [,3]
+#&gt; [1,]    1    1    1
+#&gt; [2,]    2    1    1
+#&gt; [3,]    1    2    1
+#&gt; [4,]    2    2    1
+#&gt; [5,]    1    3    1
+#&gt; [6,]    2    3    1
+</code></pre>
+<p>A similar dataframe can also be obtained with the standard R
+function \code{expand.grid} (but \code{factGrid} is faster)</p>
+<pre><code class="language-r">head( expand.grid(list(1:2, 1:3, 1:2)), 6 )
+#&gt;   Var1 Var2 Var3
+#&gt; 1    1    1    1
+#&gt; 2    2    1    1
+#&gt; 3    1    2    1
+#&gt; 4    2    2    1
+#&gt; 5    1    3    1
+#&gt; 6    2    3    1
+</code></pre>
+<p>\appendix</p>
+<h1 id="more-about-slicing">More about slicing</h1>
+<p>{#sec:more-about-slicing}</p>
+<p>Slicing using standard R code can be done as follows:</p>
+<pre><code class="language-r">hec[, 2:3, ]  |&gt; flat()  ## A 2 x 2 x 2 array
+#&gt;    Hair   Eye  Sex Freq
+#&gt; 1 Black  Blue Male   11
+#&gt; 2 Brown  Blue Male   50
+#&gt; 3 Black Hazel Male   10
+#&gt; 4 Brown Hazel Male   25
+hec[1, , 1]             ## A vector
+#&gt; Brown  Blue Hazel 
+#&gt;    32    11    10
+hec[1, , 1, drop=FALSE] ## A 1 x 3 x 1 array
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    32   11    10
+</code></pre>
+<p>Programmatically we can do the above as</p>
+<pre><code class="language-r">do.call(&quot;[&quot;, c(list(hec), list(TRUE, 2:3, TRUE)))  |&gt; flat()
+#&gt;    Hair   Eye  Sex Freq
+#&gt; 1 Black  Blue Male   11
+#&gt; 2 Brown  Blue Male   50
+#&gt; 3 Black Hazel Male   10
+#&gt; 4 Brown Hazel Male   25
+do.call(&quot;[&quot;, c(list(hec), list(1, TRUE, 1))) 
+#&gt; Brown  Blue Hazel 
+#&gt;    32    11    10
+do.call(&quot;[&quot;, c(list(hec), list(1, TRUE, 1), drop=FALSE)) 
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    32   11    10
+</code></pre>
+<p>\grbase\ provides two alterntives for each of these three cases above:</p>
+<pre><code class="language-r">tabSlicePrim(hec, slice=list(TRUE, 2:3, TRUE))  |&gt; flat()
+#&gt;    Hair   Eye  Sex Freq
+#&gt; 1 Black  Blue Male   11
+#&gt; 2 Brown  Blue Male   50
+#&gt; 3 Black Hazel Male   10
+#&gt; 4 Brown Hazel Male   25
+tabSlice(hec, slice=list(c(2, 3)), margin=2) |&gt; flat()
+#&gt;    Hair   Eye  Sex Freq
+#&gt; 1 Black  Blue Male   11
+#&gt; 2 Brown  Blue Male   50
+#&gt; 3 Black Hazel Male   10
+#&gt; 4 Brown Hazel Male   25
+
+tabSlicePrim(hec, slice=list(1, TRUE, 1))  
+#&gt; Brown  Blue Hazel 
+#&gt;    32    11    10
+tabSlice(hec, slice=list(1, 1), margin=c(1, 3)) 
+#&gt; Brown  Blue Hazel 
+#&gt;    32    11    10
+
+tabSlicePrim(hec, slice=list(1, TRUE, 1), drop=FALSE)  
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    32   11    10
+tabSlice(hec, slice=list(1, 1), margin=c(1, 3), drop=FALSE) 
+#&gt; , , Sex = Male
+#&gt; 
+#&gt;        Eye
+#&gt; Hair    Brown Blue Hazel
+#&gt;   Black    32   11    10
+</code></pre>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/combine/npm/katex/dist/katex.min.js,npm/katex/dist/contrib/auto-render.min.js,npm/@xiee/utils/js/render-katex.js" defer></script>
+</body>
+</html>

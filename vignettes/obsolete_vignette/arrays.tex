@@ -1,0 +1,1949 @@
+%\VignetteEngine{knitr::knitr} 
+%\VignetteIndexEntry{arrays: Array operations in gRbase}
+%\VignettePackage{gRbase}
+
+\documentclass[10pt]{article}\usepackage[]{graphicx}\usepackage[]{xcolor}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+%\usepackage[T1]{fontenc}
+%\usepackage[latin1]{inputenc}
+%\usepackage{inputenx}
+\usepackage{boxedminipage,color,a4wide,url}
+\usepackage[T1]{fontenc}
+
+
+\def\code#1{\texttt{#1}}
+\def\R{\texttt{R}}
+\def\pkg#1{\texttt{#1}}
+
+\def\grain{\texttt{gRain}}
+\def\grbase{\texttt{gRbase}}
+\def\ptab{\code{ptab}}
+\def\rr#1{\code{#1}[{\scriptsize gRbase}]}
+
+\usepackage{fancyvrb}
+
+\newlength{\fancyvrbtopsep}
+\newlength{\fancyvrbpartopsep}
+\makeatletter
+\FV@AddToHook{\FV@ListParameterHook}{\topsep=\fancyvrbtopsep\partopsep=\fancyvrbpartopsep}
+\makeatother
+
+\setlength{\fancyvrbtopsep}{0pt}
+\setlength{\fancyvrbpartopsep}{0pt}
+
+
+\usepackage{etoolbox} 
+\makeatletter 
+\preto{\@verbatim}{\topsep=-10pt \partopsep=-10pt } 
+\makeatother
+
+
+
+
+
+
+\title{Array operations in the \grbase\ package}
+\author{S{\o}ren H{\o}jsgaard}
+\date{\pkg{gRbase} version 2.0.2 as of 2024-05-29}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+%%\SweaveOpts{concordance=TRUE}
+
+%%\SweaveInput{Rmarkup.STY}
+
+\definecolor{darkred}{rgb}{.7,0,0}
+\definecolor{midnightblue}{rgb}{0.098,0.098,0.439}
+%% 
+%% \DefineVerbatimEnvironment{Sinput}{Verbatim}{
+%%   fontfamily=tt,
+%%   %%fontseries=b,
+%%   %% xleftmargin=2em,
+%%   formatcom={\color{midnightblue}}
+%% }
+%% \DefineVerbatimEnvironment{Soutput}{Verbatim}{
+%%   fontfamily=tt,
+%%   %%fontseries=b,
+%%   %% xleftmargin=2em,
+%%   formatcom={\color{darkred}}
+%% }
+%% \DefineVerbatimEnvironment{Scode}{Verbatim}{
+%%   fontfamily=tt,
+%%   %%fontseries=b,
+%%   %% xleftmargin=2em,
+%%   formatcom={\color{blue}}
+%% }
+%% 
+%%\fvset{listparameters={\setlength{\topsep}{-2pt}}}
+%%\renewenvironment{Schunk}{\linespread{.95}}{}
+
+\maketitle
+
+\parindent0pt\parskip5pt
+
+\tableofcontents
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+
+
+{\ttfamily\noindent\color{warningcolor}{\#\# Warning: package 'gRbase' was built under R version 4.4.0}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error: package or namespace load failed for 'gRbase' in dyn.load(file, DLLpath = DLLpath, ...):\\\#\# \ unable to load shared object '/home/sorenh/R/x86\_64-pc-linux-gnu-library/4.3/gRbase/libs/gRbase.so':\\\#\# \ \ libRblas.so: cannot open shared object file: No such file or directory}}\end{kframe}
+\end{knitrout}
+
+
+\section{Introduction}
+
+This note describes some operations on arrays in \R. These operations
+have been implemented to facilitate implementation of graphical models
+and Bayesian networks in \R.
+
+\section{Arrays/tables in \R}
+\label{sec:arrays}
+
+The documentation of \R\ states the following about arrays:
+
+\begin{quote}
+  \em An array in R can have one, two or more dimensions. It is simply
+  a vector which is stored with additional attributes giving the
+  dimensions (attribute "dim") and optionally names for those
+  dimensions (attribute "dimnames").  A two-dimensional array is the
+  same thing as a matrix.  One-dimensional arrays often look like
+  vectors, but may be handled differently by some functions.
+\end{quote}
+
+
+
+%% <<>>=
+%% apropos("^tab[A-Z]", ignore.case=FALSE)
+%% @ %def
+
+%% <<>>=
+%% apropos("^table[A-Z]", ignore.case=FALSE)
+%% @ %def
+
+%% <<>>=
+%% apropos("^ar_", ignore.case=FALSE)
+%% @ %def
+
+
+\subsection{Cross classified data - contingency tables}
+\label{sec:new}
+
+Arrays appear for example in connection with cross classified data. The array
+\code{hec} below is an excerpt of the \code{HairEyeColor} array in \R:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{hec} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{32}\hlstd{,} \hlnum{53}\hlstd{,} \hlnum{11}\hlstd{,} \hlnum{50}\hlstd{,} \hlnum{10}\hlstd{,} \hlnum{25}\hlstd{,} \hlnum{36}\hlstd{,} \hlnum{66}\hlstd{,} \hlnum{9}\hlstd{,} \hlnum{34}\hlstd{,} \hlnum{5}\hlstd{,} \hlnum{29}\hlstd{)}
+\hlkwd{dim}\hlstd{(hec)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2}\hlstd{)}
+\hlkwd{dimnames}\hlstd{(hec)} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{Hair} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"Black"}\hlstd{,} \hlstr{"Brown"}\hlstd{),}
+                      \hlkwc{Eye} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"Brown"}\hlstd{,} \hlstr{"Blue"}\hlstd{,} \hlstr{"Hazel"}\hlstd{),}
+                      \hlkwc{Sex} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"Male"}\hlstd{,} \hlstr{"Female"}\hlstd{))}
+\hlstd{hec}
+\end{alltt}
+\begin{verbatim}
+## , , Sex = Male
+## 
+##        Eye
+## Hair    Brown Blue Hazel
+##   Black    32   11    10
+##   Brown    53   50    25
+## 
+## , , Sex = Female
+## 
+##        Eye
+## Hair    Brown Blue Hazel
+##   Black    36    9     5
+##   Brown    66   34    29
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Above, \code{hec} is an array because it has a \code{dim} attribute. Moreover,
+\code{hec} also has a \code{dimnames} attribute naming the levels of each
+dimension. Notice that each dimension is given a name.
+
+Printing arrays can take up a lot of space.  Alternative views on an
+array can be obtained with \code{ftable()} or by converting the array
+to a dataframe with \code{as.data.frame.table()}. We shall do so in the following.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{##flat <- function(x) \{ftable(x, row.vars=1)\}}
+\hlstd{flat} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{,} \hlkwc{n}\hlstd{=}\hlnum{4}\hlstd{) \{}\hlkwd{as.data.frame.table}\hlstd{(x)} \hlopt{%>%} \hlkwd{head}\hlstd{(n)\}}
+\hlstd{hec} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in hec \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+An array with named dimensions is in this package called a \emph{named array}.
+The functionality described below relies heavily on arrays having named dimensions.
+A check for an object being a named array is provided by
+\rr{is.named.array()}
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{is.named.array}\hlstd{(hec)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in is.named.array(hec): could not find function "{}is.named.array"{}}}\end{kframe}
+\end{knitrout}
+
+
+\subsection{Defining arrays}
+
+
+Another way is to use \rr{tabNew()} from \grbase. This function is flexible wrt the input; for example:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{dn} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{Hair}\hlstd{=}\hlkwd{c}\hlstd{(}\hlstr{"Black"}\hlstd{,} \hlstr{"Brown"}\hlstd{),} \hlkwc{Eye}\hlstd{=}\hlopt{~}\hlstd{Brown}\hlopt{:}\hlstd{Blue}\hlopt{:}\hlstd{Hazel,} \hlkwc{Sex}\hlstd{=}\hlopt{~}\hlstd{Male}\hlopt{:}\hlstd{Female)}
+\hlstd{counts} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{32}\hlstd{,} \hlnum{53}\hlstd{,} \hlnum{11}\hlstd{,} \hlnum{50}\hlstd{,} \hlnum{10}\hlstd{,} \hlnum{25}\hlstd{,} \hlnum{36}\hlstd{,} \hlnum{66}\hlstd{,} \hlnum{9}\hlstd{,} \hlnum{34}\hlstd{,} \hlnum{5}\hlstd{,} \hlnum{29}\hlstd{)}
+\hlstd{z3} \hlkwb{<-} \hlkwd{tabNew}\hlstd{(}\hlopt{~}\hlstd{Hair}\hlopt{:}\hlstd{Eye}\hlopt{:}\hlstd{Sex,} \hlkwc{levels}\hlstd{=dn,} \hlkwc{value}\hlstd{=counts)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabNew(\textasciitilde{}Hair:Eye:Sex, levels = dn, value = counts): could not find function "{}tabNew"{}}}\begin{alltt}
+\hlstd{z4} \hlkwb{<-} \hlkwd{tabNew}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{"Hair"}\hlstd{,} \hlstr{"Eye"}\hlstd{,} \hlstr{"Sex"}\hlstd{),} \hlkwc{levels}\hlstd{=dn,} \hlkwc{values}\hlstd{=counts)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabNew(c("{}Hair"{}, "{}Eye"{}, "{}Sex"{}), levels = dn, values = counts): could not find function "{}tabNew"{}}}\end{kframe}
+\end{knitrout}
+
+Notice that the levels list (\code{dn} above) when used in \rr{tabNew()} 
+is allowed to contain superfluous elements. Default
+\code{dimnames} are generated with
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{z5} \hlkwb{<-} \hlkwd{tabNew}\hlstd{(}\hlopt{~}\hlstd{Hair}\hlopt{:}\hlstd{Eye}\hlopt{:}\hlstd{Sex,} \hlkwc{levels}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2}\hlstd{),} \hlkwc{values} \hlstd{= counts)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabNew(\textasciitilde{}Hair:Eye:Sex, levels = c(2, 3, 2), values = counts): could not find function "{}tabNew"{}}}\begin{alltt}
+\hlkwd{dimnames}\hlstd{(z5)} \hlopt{%>%} \hlstd{str}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in dimnames(z5) \%>\% str: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+
+Using \rr{tabNew}, arrays can be normalized to sum to one in two ways:
+1) Normalization can be over the first variable for \emph{each}
+configuration of all other variables and 2) over all configurations. For
+example:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{z6} \hlkwb{<-} \hlkwd{tabNew}\hlstd{(}\hlopt{~}\hlstd{Hair}\hlopt{:}\hlstd{Eye}\hlopt{:}\hlstd{Sex,} \hlkwc{levels}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2}\hlstd{),} \hlkwc{values}\hlstd{=counts,} \hlkwc{normalize}\hlstd{=}\hlstr{"first"}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabNew(\textasciitilde{}Hair:Eye:Sex, levels = c(2, 3, 2), values = counts, normalize = "{}first"{}): could not find function "{}tabNew"{}}}\begin{alltt}
+\hlstd{z6} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in z6 \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+
+\section{Operations on arrays}
+\label{sec:operations-arrays}
+
+In the following we shall denote the dimnames 
+(or variables) of the array \code{hec} by $H$, $E$ and $S$ and we let $(h,e,s)$
+denote a configuration of these variables. The contingency table above
+shall be denoted by $T_{HES}$ and we shall refer to the
+$(h,e,s)$-entry of $T_{HES}$ as $T_{HES}(h,e,s)$. 
+
+\subsection{Normalizing an array}
+\label{sec:numarlizing-an-array}
+
+Normalize an array with  \rr{tabNormalize()}
+Entries of an array can be normalized to sum to one in two ways:
+1) Normalization can be over the first variable for \emph{each}
+configuration of all other variables and 2) over all configurations. For
+example:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabNormalize}\hlstd{(z5,} \hlstr{"first"}\hlstd{)} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabNormalize(z5, "{}first"{}) \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+
+\subsection{Subsetting an array -- slicing}
+\label{sec:subsetting-an-array}
+
+We can subset arrays (this will also be called ``slicing'') in
+different ways. Notice that the result is not necessarily an
+array. Slicing can be done using standard \R\ code or using \rr{tabSlice}.
+The virtue of \rr{tabSlice} comes from the flexibility when
+specifying the slice:
+
+
+The following leads from the original $2\times 3 \times 2$
+array to a $2 \times 2$
+array by cutting away the \code{Sex=Male} and \code{Eye=Brown} slice of the array:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabSlice}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{Eye}\hlstd{=}\hlkwd{c}\hlstd{(}\hlstr{"Blue"}\hlstd{,} \hlstr{"Hazel"}\hlstd{),} \hlkwc{Sex}\hlstd{=}\hlstr{"Female"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlice(hec, slice = list(Eye = c("{}Blue"{}, "{}Hazel"{}), Sex = "{}Female"{})): could not find function "{}tabSlice"{}}}\begin{alltt}
+\hlcom{## Notice: levels can be written as numerics}
+\hlcom{## tabSlice(hec, slice=list(Eye=2:3, Sex="Female"))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+We may also regard the result above as a $2 \times 2 \times 1$ array:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabSlice}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{Eye}\hlstd{=}\hlkwd{c}\hlstd{(}\hlstr{"Blue"}\hlstd{,} \hlstr{"Hazel"}\hlstd{),} \hlkwc{Sex}\hlstd{=}\hlstr{"Female"}\hlstd{),} \hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlice(hec, slice = list(Eye = c("{}Blue"{}, "{}Hazel"{}), Sex = "{}Female"{}), : could not find function "{}tabSlice"{}}}\end{kframe}
+\end{knitrout}
+
+If slicing leads to a one dimensional array, the output will by
+default not be an array but a vector (without a dim attribute). However, 
+the result can be forced to be a 1-dimensional array:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## A vector:}
+\hlstd{t1} \hlkwb{<-} \hlkwd{tabSlice}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{Hair}\hlstd{=}\hlnum{1}\hlstd{,} \hlkwc{Sex}\hlstd{=}\hlstr{"Female"}\hlstd{)); t1}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlice(hec, slice = list(Hair = 1, Sex = "{}Female"{})): could not find function "{}tabSlice"{}}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 't1' not found}}\begin{alltt}
+\hlcom{## A 1-dimensional array:}
+\hlstd{t2} \hlkwb{<-} \hlkwd{tabSlice}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{Hair}\hlstd{=}\hlnum{1}\hlstd{,} \hlkwc{Sex}\hlstd{=}\hlstr{"Female"}\hlstd{),} \hlkwc{as.array}\hlstd{=}\hlnum{TRUE}\hlstd{); t2}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlice(hec, slice = list(Hair = 1, Sex = "{}Female"{}), as.array = TRUE): could not find function "{}tabSlice"{}}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 't2' not found}}\begin{alltt}
+\hlcom{## A higher dimensional array (in which some dimensions only have one level)}
+\hlstd{t3} \hlkwb{<-} \hlkwd{tabSlice}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{Hair}\hlstd{=}\hlnum{1}\hlstd{,} \hlkwc{Sex}\hlstd{=}\hlstr{"Female"}\hlstd{),} \hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{); t3}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlice(hec, slice = list(Hair = 1, Sex = "{}Female"{}), drop = FALSE): could not find function "{}tabSlice"{}}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 't3' not found}}\end{kframe}
+\end{knitrout}
+
+The difference between the last two forms can be clarified:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{t2} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in t2 \%>\% flat: could not find function "{}\%>\%"{}}}\begin{alltt}
+\hlstd{t3} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in t3 \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+
+
+\subsection{Collapsing  and inflating arrays}
+\label{sec:collapsing-arrays}
+
+Collapsing: The $HE$--marginal array $T_{HE}$ of $T_{HES}$ is  the array with
+values
+\begin{displaymath}
+  T_{HE}(h,e) = \sum_s T_{HES}(h,e,s)
+\end{displaymath}
+Inflating: The ``opposite'' operation is to extend an array. For example, we can
+extend $T_{HE}$ to have a third dimension, e.g.\ \code{Sex}. That is
+\begin{displaymath}
+  \tilde T_{SHE}(s,h,e) = T_{HE}(h,e)
+\end{displaymath}
+so $\tilde T_{SHE}(s,h,e)$ is constant as a function of $s$. 
+
+With \grbase\ we can collapse arrays with\footnote{FIXME: Should allow for abbreviations in
+  formula and character vector specifications.}:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{he} \hlkwb{<-} \hlkwd{tabMarg}\hlstd{(hec,} \hlkwd{c}\hlstd{(}\hlstr{"Hair"}\hlstd{,} \hlstr{"Eye"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(hec, c("{}Hair"{}, "{}Eye"{})): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlstd{he}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'he' not found}}\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Alternatives}
+\hlkwd{tabMarg}\hlstd{(hec,} \hlopt{~}\hlstd{Hair}\hlopt{:}\hlstd{Eye)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(hec, \textasciitilde{}Hair:Eye): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlkwd{tabMarg}\hlstd{(hec,} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{2}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(hec, c(1, 2)): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlstd{hec} \hlopt{%a_% ~}\hlstd{Hair}\hlopt{:}\hlstd{Eye}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in hec \%a\_\% \textasciitilde{}Hair:Eye: could not find function "{}\%a\_\%"{}}}\end{kframe}
+\end{knitrout}
+
+Notice that collapsing is a projection in the sense that applying the
+operation again does not change anything:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{he1} \hlkwb{<-} \hlkwd{tabMarg}\hlstd{(hec,} \hlkwd{c}\hlstd{(}\hlstr{"Hair"}\hlstd{,} \hlstr{"Eye"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(hec, c("{}Hair"{}, "{}Eye"{})): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlstd{he2} \hlkwb{<-} \hlkwd{tabMarg}\hlstd{(he1,} \hlkwd{c}\hlstd{(}\hlstr{"Hair"}\hlstd{,} \hlstr{"Eye"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(he1, c("{}Hair"{}, "{}Eye"{})): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlkwd{tabEqual}\hlstd{(he1, he2)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabEqual(he1, he2): could not find function "{}tabEqual"{}}}\end{kframe}
+\end{knitrout}
+
+Expand an array by adding additional dimensions with \rr{tabExpand()}:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{extra.dim} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{Sex}\hlstd{=}\hlkwd{c}\hlstd{(}\hlstr{"Male"}\hlstd{,} \hlstr{"Female"}\hlstd{))}
+\hlkwd{tabExpand}\hlstd{(he, extra.dim)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabExpand(he, extra.dim): could not find function "{}tabExpand"{}}}\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Alternatives}
+\hlstd{he} \hlopt{%a^%} \hlstd{extra.dim}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in he \%a\textasciicircum{}\% extra.dim: could not find function "{}\%a\textasciicircum{}\%"{}}}\end{kframe}
+\end{knitrout}
+
+Notice that expanding and collapsing brings us back to where we started:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{(he} \hlopt{%a^%} \hlstd{extra.dim)} \hlopt{%a_%} \hlkwd{c}\hlstd{(}\hlstr{"Hair"}\hlstd{,} \hlstr{"Eye"}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in (he \%a\textasciicircum{}\% extra.dim) \%a\_\% c("{}Hair"{}, "{}Eye"{}): could not find function "{}\%a\_\%"{}}}\end{kframe}
+\end{knitrout}
+
+
+\subsection{Permuting an array}
+\label{sec:permuting-an-array}
+
+A reorganization of the table can be made with \rr{tabPerm} (similar
+to \code{aperm()}), but \rr{tabPerm} allows for a formula and for variable abbreviation:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabPerm}\hlstd{(hec,} \hlopt{~}\hlstd{Eye}\hlopt{:}\hlstd{Sex}\hlopt{:}\hlstd{Hair)} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabPerm(hec, \textasciitilde{}Eye:Sex:Hair) \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+Alternative forms (the first two also works for \code{aperm}):
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabPerm}\hlstd{(hec,} \hlkwd{c}\hlstd{(}\hlstr{"Eye"}\hlstd{,} \hlstr{"Sex"}\hlstd{,} \hlstr{"Hair"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabPerm(hec, c("{}Eye"{}, "{}Sex"{}, "{}Hair"{})): could not find function "{}tabPerm"{}}}\begin{alltt}
+\hlkwd{tabPerm}\hlstd{(hec,} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{1}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabPerm(hec, c(2, 3, 1)): could not find function "{}tabPerm"{}}}\begin{alltt}
+\hlkwd{tabPerm}\hlstd{(hec,} \hlopt{~}\hlstd{Ey}\hlopt{:}\hlstd{Se}\hlopt{:}\hlstd{Ha)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabPerm(hec, \textasciitilde{}Ey:Se:Ha): could not find function "{}tabPerm"{}}}\begin{alltt}
+\hlkwd{tabPerm}\hlstd{(hec,} \hlkwd{c}\hlstd{(}\hlstr{"Ey"}\hlstd{,} \hlstr{"Se"}\hlstd{,} \hlstr{"Ha"}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabPerm(hec, c("{}Ey"{}, "{}Se"{}, "{}Ha"{})): could not find function "{}tabPerm"{}}}\end{kframe}
+\end{knitrout}
+
+
+
+
+\subsection{Equality}
+\label{sec:equality}
+
+Two arrays are defined to be identical 1) if they have the same dimnames
+and 2) if, possibly after a permutation, all values are identical (up to
+a small numerical difference):
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{hec2} \hlkwb{<-} \hlkwd{tabPerm}\hlstd{(hec,} \hlnum{3}\hlopt{:}\hlnum{1}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabPerm(hec, 3:1): could not find function "{}tabPerm"{}}}\begin{alltt}
+\hlkwd{tabEqual}\hlstd{(hec, hec2)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabEqual(hec, hec2): could not find function "{}tabEqual"{}}}\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Alternative}
+\hlstd{hec} \hlopt{%a==%} \hlstd{hec2}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in hec \%a==\% hec2: could not find function "{}\%a==\%"{}}}\end{kframe}
+\end{knitrout}
+
+\subsection{Aligning}
+\label{sec:aligning}
+
+We can align one array according to the ordering of another:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{hec2} \hlkwb{<-} \hlkwd{tabPerm}\hlstd{(hec,} \hlnum{3}\hlopt{:}\hlnum{1}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabPerm(hec, 3:1): could not find function "{}tabPerm"{}}}\begin{alltt}
+\hlkwd{tabAlign}\hlstd{(hec2, hec)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabAlign(hec2, hec): could not find function "{}tabAlign"{}}}\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Alternative:}
+\hlkwd{tabAlign}\hlstd{(hec2,} \hlkwd{dimnames}\hlstd{(hec))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabAlign(hec2, dimnames(hec)): could not find function "{}tabAlign"{}}}\end{kframe}
+\end{knitrout}
+
+
+
+%\section{Operations on two or more arrays}
+%\label{sec:oper-two-arrays}
+
+\subsection{Multiplication, addition etc:  $+$, $-$, $*$, $/$}
+\label{sec:mult-addt-etc}
+
+The product of two arrays $T_{HE}$ and $T_{HS}$ is defined to be the array
+$\tilde T_{HES}$ with entries
+\begin{displaymath}
+  \tilde T_{HES}(h,e,s)= T_{HE}(h,e) + T_{HS}(h,s)
+\end{displaymath}
+
+The sum, difference and quotient is defined similarly: This is done
+with \rr{tabProd()}, \rr{tabAdd()}, \rr{tabDiff()} and \rr{tabDiv()}:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{hs} \hlkwb{<-} \hlkwd{tabMarg}\hlstd{(hec,} \hlopt{~}\hlstd{Hair}\hlopt{:}\hlstd{Eye)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(hec, \textasciitilde{}Hair:Eye): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlkwd{tabMult}\hlstd{(he, hs)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMult(he, hs): could not find function "{}tabMult"{}}}\end{kframe}
+\end{knitrout}
+
+Available operations:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabAdd}\hlstd{(he, hs)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabAdd(he, hs): could not find function "{}tabAdd"{}}}\begin{alltt}
+\hlkwd{tabSubt}\hlstd{(he, hs)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSubt(he, hs): could not find function "{}tabSubt"{}}}\begin{alltt}
+\hlkwd{tabMult}\hlstd{(he, hs)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMult(he, hs): could not find function "{}tabMult"{}}}\begin{alltt}
+\hlkwd{tabDiv}\hlstd{(he, hs)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabDiv(he, hs): could not find function "{}tabDiv"{}}}\begin{alltt}
+\hlkwd{tabDiv0}\hlstd{(he, hs)} \hlcom{## Convention 0/0 = 0}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabDiv0(he, hs): could not find function "{}tabDiv0"{}}}\end{kframe}
+\end{knitrout}
+
+Shortcuts:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Alternative}
+\hlstd{he} \hlopt{%a+%} \hlstd{hs}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in he \%a+\% hs: could not find function "{}\%a+\%"{}}}\begin{alltt}
+\hlstd{he} \hlopt{%a-%} \hlstd{hs}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in he \%a-\% hs: could not find function "{}\%a-\%"{}}}\begin{alltt}
+\hlstd{he} \hlopt{%a*%} \hlstd{hs}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in he \%a*\% hs: could not find function "{}\%a*\%"{}}}\begin{alltt}
+\hlstd{he} \hlopt{%a/%} \hlstd{hs}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in he \%a/\% hs: could not find function "{}\%a/\%"{}}}\begin{alltt}
+\hlstd{he} \hlopt{%a/0%} \hlstd{hs} \hlcom{## Convention 0/0 = 0}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in he \%a/0\% hs: could not find function "{}\%a/0\%"{}}}\end{kframe}
+\end{knitrout}
+
+Multiplication and addition of (a list of) multiple arrays is
+accomplished with \rr{tabProd()} and \rr{tabSum()} (much like
+\rr{prod()} and \rr{sum()}):
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{es} \hlkwb{<-} \hlkwd{tabMarg}\hlstd{(hec,} \hlopt{~}\hlstd{Eye}\hlopt{:}\hlstd{Sex)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(hec, \textasciitilde{}Eye:Sex): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlkwd{tabSum}\hlstd{(he, hs, es)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSum(he, hs, es): could not find function "{}tabSum"{}}}\begin{alltt}
+\hlcom{## tabSum(list(he, hs, es))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+
+%% Lists of arrays are processed with
+%% <<results=chk>>= 
+%% tabListAdd(list(he, hs, es))
+%% tabListMult(list(he, hs, es))
+%% @
+
+\subsection{An array as a probability density}
+\label{sec:an-array-as}
+
+If an array consists of non--negative numbers then it may be regarded as an
+(unnormalized) discrete multivariate density. With this view, the following
+examples should be self explanatory:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabDist}\hlstd{(hec,} \hlkwc{marg}\hlstd{=}\hlopt{~}\hlstd{Hair}\hlopt{:}\hlstd{Eye)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabDist(hec, marg = \textasciitilde{}Hair:Eye): could not find function "{}tabDist"{}}}\begin{alltt}
+\hlkwd{tabDist}\hlstd{(hec,} \hlkwc{cond}\hlstd{=}\hlopt{~}\hlstd{Sex)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabDist(hec, cond = \textasciitilde{}Sex): could not find function "{}tabDist"{}}}\begin{alltt}
+\hlkwd{tabDist}\hlstd{(hec,} \hlkwc{marg}\hlstd{=}\hlopt{~}\hlstd{Hair,} \hlkwc{cond}\hlstd{=}\hlopt{~}\hlstd{Sex)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabDist(hec, marg = \textasciitilde{}Hair, cond = \textasciitilde{}Sex): could not find function "{}tabDist"{}}}\end{kframe}
+\end{knitrout}
+
+\subsection{Miscellaneous}
+\label{sec:miscellaneous-1}
+
+Multiply values in a slice by some number and all other values by
+another number:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabSliceMult}\hlstd{(es,} \hlkwd{list}\hlstd{(}\hlkwc{Sex}\hlstd{=}\hlstr{"Female"}\hlstd{),} \hlkwc{val}\hlstd{=}\hlnum{10}\hlstd{,} \hlkwc{comp}\hlstd{=}\hlnum{0}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSliceMult(es, list(Sex = "{}Female"{}), val = 10, comp = 0): could not find function "{}tabSliceMult"{}}}\end{kframe}
+\end{knitrout}
+
+
+
+
+
+
+%% 
+%%For example, the following provides the fitted cell counts under a
+%%specific log--linear model:
+%%<<>>=
+%%hec3 <- ar_div( ar_mult( he, es ), tabMarg( hec, "Eye" ) )
+%%hec3 %>% flat
+%%@ %def 
+%%Comparing these with the observed data is tricky because of the ordering:
+%%<<>>=
+%%hec %>% flat
+%%@ %def 
+%%
+%%The function \rr{ar\_align()} will align the first array to have the same
+%%variable order as the second array which makes a visual comparison
+%%easier:\footnote{FIXME: aralign should be modified so that the second
+%%  argument can also be a list of dimnames} 
+%%<<>>=
+%%tabAlign(hec3, hec)  %>% flat
+%%ar_perm(hec3, names(dimnames(hec)))  %>% flat
+%%@ %def 
+%%
+%%<< >>= 
+%%microbenchmark::microbenchmark(
+%%                    tabAlign(hec3, hec),
+%%                    ar_perm(hec3, names(dimnames(hec)))
+%%                    )
+%%@
+%%
+
+
+\section{Examples}
+\label{sec:examples}
+
+
+\subsection{A Bayesian network}
+\label{sec:comp-with-arrays}
+
+A classical example of a Bayesian network is the ``sprinkler
+example'', see e.g.\
+\url{http://en.wikipedia.org/wiki/Bayesian_network}:
+\begin{quote}
+  \em
+  Suppose that there are two events which could cause grass to be wet:
+  either the sprinkler is on or it is raining. Also, suppose that the
+  rain has a direct effect on the use of the sprinkler (namely that
+  when it rains, the sprinkler is usually not turned on). Then the
+  situation can be modeled with a Bayesian network.
+\end{quote}
+
+We specify conditional probabilities $p(r)$, $p(s|r)$ and $p(w|s,r)$
+as follows
+(notice that the vertical conditioning bar ($|$) is replaced by the
+horizontal underscore:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{yn} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"y"}\hlstd{,}\hlstr{"n"}\hlstd{)}
+\hlstd{lev} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{rain}\hlstd{=yn,} \hlkwc{sprinkler}\hlstd{=yn,} \hlkwc{wet}\hlstd{=yn)}
+\hlstd{r} \hlkwb{<-} \hlkwd{tabNew}\hlstd{(}\hlopt{~}\hlstd{rain,} \hlkwc{levels}\hlstd{=lev,} \hlkwc{values}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{.2}\hlstd{,} \hlnum{.8}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabNew(\textasciitilde{}rain, levels = lev, values = c(0.2, 0.8)): could not find function "{}tabNew"{}}}\begin{alltt}
+\hlstd{s_r} \hlkwb{<-} \hlkwd{tabNew}\hlstd{(}\hlopt{~}\hlstd{sprinkler}\hlopt{:}\hlstd{rain,} \hlkwc{levels} \hlstd{= lev,} \hlkwc{values} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{.01}\hlstd{,} \hlnum{.99}\hlstd{,} \hlnum{.4}\hlstd{,} \hlnum{.6}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabNew(\textasciitilde{}sprinkler:rain, levels = lev, values = c(0.01, 0.99, : could not find function "{}tabNew"{}}}\begin{alltt}
+\hlstd{w_sr} \hlkwb{<-} \hlkwd{tabNew}\hlstd{(} \hlopt{~}\hlstd{wet}\hlopt{:}\hlstd{sprinkler}\hlopt{:}\hlstd{rain,} \hlkwc{levels}\hlstd{=lev,}
+             \hlkwc{values}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{.99}\hlstd{,} \hlnum{.01}\hlstd{,} \hlnum{.8}\hlstd{,} \hlnum{.2}\hlstd{,} \hlnum{.9}\hlstd{,} \hlnum{.1}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabNew(\textasciitilde{}wet:sprinkler:rain, levels = lev, values = c(0.99, 0.01, : could not find function "{}tabNew"{}}}\begin{alltt}
+\hlstd{r}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'r' not found}}\begin{alltt}
+\hlstd{s_r}  \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in s\_r \%>\% flat: could not find function "{}\%>\%"{}}}\begin{alltt}
+\hlstd{w_sr} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in w\_sr \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+The joint distribution $p(r,s,w)=p(r)p(s|r)p(w|s,r)$ can be obtained
+with \rr{tabProd()}:
+ways:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{joint} \hlkwb{<-} \hlkwd{tabProd}\hlstd{(r, s_r, w_sr); joint} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabProd(r, s\_r, w\_sr): could not find function "{}tabProd"{}}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in joint \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+What is the probability that it rains given that the grass is wet? We
+find $p(r,w)=\sum_s p(r,s,w)$ and then $p(r|w)=p(r,w)/p(w)$. Can be done in various ways: with \rr{tabDist()}
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabDist}\hlstd{(joint,} \hlkwc{marg}\hlstd{=}\hlopt{~}\hlstd{rain,} \hlkwc{cond}\hlstd{=}\hlopt{~}\hlstd{wet)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabDist(joint, marg = \textasciitilde{}rain, cond = \textasciitilde{}wet): could not find function "{}tabDist"{}}}\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Alternative:}
+\hlstd{rw} \hlkwb{<-} \hlkwd{tabMarg}\hlstd{(joint,} \hlopt{~}\hlstd{rain} \hlopt{+} \hlstd{wet)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(joint, \textasciitilde{}rain + wet): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlkwd{tabDiv}\hlstd{(rw,} \hlkwd{tabMarg}\hlstd{(rw,} \hlopt{~}\hlstd{wet))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabDiv(rw, tabMarg(rw, \textasciitilde{}wet)): could not find function "{}tabDiv"{}}}\begin{alltt}
+\hlcom{## or}
+\hlstd{rw} \hlopt{%a/%} \hlstd{(rw} \hlopt{%a_% ~}\hlstd{wet)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in rw \%a/\% (rw \%a\_\% \textasciitilde{}wet): could not find function "{}\%a/\%"{}}}\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## Alternative:}
+\hlstd{x} \hlkwb{<-} \hlkwd{tabSliceMult}\hlstd{(rw,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{wet}\hlstd{=}\hlstr{"y"}\hlstd{)); x}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSliceMult(rw, slice = list(wet = "{}y"{})): could not find function "{}tabSliceMult"{}}}
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'x' not found}}\begin{alltt}
+\hlkwd{tabDist}\hlstd{(x,} \hlkwc{marg}\hlstd{=}\hlopt{~}\hlstd{rain)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabDist(x, marg = \textasciitilde{}rain): could not find function "{}tabDist"{}}}\end{kframe}
+\end{knitrout}
+
+\subsection{Iterative Proportional Scaling (IPS)}
+\label{sec:ips}
+
+We consider the $3$--way \code{lizard} data from \grbase:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{data}\hlstd{(lizard,} \hlkwc{package}\hlstd{=}\hlstr{"gRbase"}\hlstd{)}
+\hlstd{lizard} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in lizard \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+Consider the two factor log--linear model for the \verb'lizard'
+data. Under the model the expected counts have the form
+\begin{displaymath}
+  \log m(d,h,s)= a_1(d,h)+a_2(d,s)+a_3(h,s)
+\end{displaymath}
+If we let $n(d,h,s)$ denote the observed counts, the likelihood
+equations are: Find $m(d,h,s)$ such that
+\begin{displaymath}
+  m(d,h)=n(d,h), \quad
+  m(d,s)=n(d,s), \quad
+  m(h,s)=n(h,s)
+\end{displaymath}
+where $m(d,h)=\sum_s m(d,h.s)$ etc. 
+The updates are as follows: For the first term we have
+
+\begin{displaymath}
+  m(d,h,s) \leftarrow m(d,h,s) \frac{n(d,h)}{m(d,h)}
+%  , \mbox{ where }
+%  m(d,h) = \sum_s m(d,h,s)
+\end{displaymath}
+After iterating the updates will not change and we will have equality:
+$  m(d,h,s) = m(d,h,s) \frac{n(d,h)}{m(d,h)}$ and summing over $s$
+shows that the equation $m(d,h)=n(d,h)$ is satisfied. 
+
+A rudimentary implementation of iterative proportional scaling for
+log--linear models is straight forward:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{myips} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{indata}\hlstd{,} \hlkwc{glist}\hlstd{)\{}
+    \hlstd{fit}   \hlkwb{<-} \hlstd{indata}
+    \hlstd{fit[]} \hlkwb{<-}  \hlnum{1}
+    \hlcom{## List of sufficient marginal tables}
+    \hlstd{md}    \hlkwb{<-} \hlkwd{lapply}\hlstd{(glist,} \hlkwa{function}\hlstd{(}\hlkwc{g}\hlstd{)} \hlkwd{tabMarg}\hlstd{(indata, g))}
+
+    \hlkwa{for} \hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlnum{4}\hlstd{)\{}
+        \hlkwa{for} \hlstd{(j} \hlkwa{in} \hlkwd{seq_along}\hlstd{(glist))\{}
+            \hlstd{mf}  \hlkwb{<-} \hlkwd{tabMarg}\hlstd{(fit, glist[[j]])}
+            \hlcom{# adj <- tabDiv( md[[ j ]], mf)}
+            \hlcom{# fit <- tabMult( fit, adj )}
+            \hlcom{## or}
+            \hlstd{adj} \hlkwb{<-} \hlstd{md[[ j ]]} \hlopt{%a/%} \hlstd{mf}
+            \hlstd{fit} \hlkwb{<-} \hlstd{fit} \hlopt{%a*%} \hlstd{adj}
+        \hlstd{\}}
+    \hlstd{\}}
+    \hlstd{pearson} \hlkwb{<-} \hlkwd{sum}\hlstd{((fit} \hlopt{-} \hlstd{indata)}\hlopt{^}\hlnum{2} \hlopt{/} \hlstd{fit)}
+    \hlkwd{list}\hlstd{(}\hlkwc{pearson}\hlstd{=pearson,} \hlkwc{fit}\hlstd{=fit)}
+\hlstd{\}}
+
+\hlstd{glist} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{"species"}\hlstd{,} \hlstr{"diam"}\hlstd{),}\hlkwd{c}\hlstd{(}\hlstr{"species"}\hlstd{,} \hlstr{"height"}\hlstd{),}\hlkwd{c}\hlstd{(}\hlstr{"diam"}\hlstd{,} \hlstr{"height"}\hlstd{))}
+
+\hlstd{fm1} \hlkwb{<-} \hlkwd{myips}\hlstd{(lizard, glist)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabMarg(indata, g): could not find function "{}tabMarg"{}}}\begin{alltt}
+\hlstd{fm1}\hlopt{$}\hlstd{pearson}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'fm1' not found}}\begin{alltt}
+\hlstd{fm1}\hlopt{$}\hlstd{fit} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in fm1\$fit \%>\% flat: could not find function "{}\%>\%"{}}}\begin{alltt}
+\hlstd{fm2} \hlkwb{<-} \hlkwd{loglin}\hlstd{(lizard, glist,} \hlkwc{fit}\hlstd{=T)}
+\end{alltt}
+\begin{verbatim}
+## 4 iterations: deviation 0.009619
+\end{verbatim}
+\begin{alltt}
+\hlstd{fm2}\hlopt{$}\hlstd{pearson}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.1506
+\end{verbatim}
+\begin{alltt}
+\hlstd{fm2}\hlopt{$}\hlstd{fit} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in fm2\$fit \%>\% flat: could not find function "{}\%>\%"{}}}\end{kframe}
+\end{knitrout}
+
+
+\section{Some low level functions}
+\label{sec:some-low-level}
+
+For e.g.\ a $2\times 3 \times 2$ array, the entries are such that the first
+variable varies fastest so the ordering of the cells are $(1,1,1)$,
+$(2,1,1)$, $(1,2,1)$, $(2,2,1)$,$(1,3,1)$ and so on. To find the value
+of such a cell, say,
+$(j,k,l)$ in the array (which is really just a vector), the cell is
+mapped into an entry of a vector. 
+
+For example, cell $(2,3,1)$
+(\verb|Hair=Brown|, \verb|Eye=Hazel|, \verb|Sex=Male|) must be mapped to
+entry $4$ in
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{hec}
+\end{alltt}
+\begin{verbatim}
+## , , Sex = Male
+## 
+##        Eye
+## Hair    Brown Blue Hazel
+##   Black    32   11    10
+##   Brown    53   50    25
+## 
+## , , Sex = Female
+## 
+##        Eye
+## Hair    Brown Blue Hazel
+##   Black    36    9     5
+##   Brown    66   34    29
+\end{verbatim}
+\begin{alltt}
+\hlkwd{c}\hlstd{(hec)}
+\end{alltt}
+\begin{verbatim}
+##  [1] 32 53 11 50 10 25 36 66  9 34  5 29
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+For illustration we do:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{cell2name} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{cell}\hlstd{,} \hlkwc{dimnames}\hlstd{)\{}
+    \hlkwd{unlist}\hlstd{(}\hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlkwd{length}\hlstd{(cell),} \hlkwa{function}\hlstd{(}\hlkwc{m}\hlstd{) dimnames[[m]][cell[m]]))}
+\hlstd{\}}
+\hlkwd{cell2name}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwd{dimnames}\hlstd{(hec))}
+\end{alltt}
+\begin{verbatim}
+## [1] "Brown" "Hazel" "Male"
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+
+\subsection{\code{cell2entry()}, \code{entry2cell()} and \code{next\_cell()} }
+
+
+The map from a cell to the corresponding
+entry is provided by \rr{cell2entry()}. The reverse operation, going
+from an entry to a cell (which is much less needed) is provided by
+\rr {entry2cell()}.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{cell2entry}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{dim}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in cell2entry(c(2, 3, 1), dim = c(2, 3, 2)): could not find function "{}cell2entry"{}}}\begin{alltt}
+\hlkwd{entry2cell}\hlstd{(}\hlnum{6}\hlstd{,} \hlkwc{dim}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in entry2cell(6, dim = c(2, 3, 2)): could not find function "{}entry2cell"{}}}\end{kframe}
+\end{knitrout}
+
+
+Given a cell, say $i=(2,3,1)$ in a $2\times 3\times 2$ array we often want to find the next cell in
+the table following the convention that the first factor varies
+fastest, that is $(1,1,2)$. This is provided by
+\rr{next\_cell()}.
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{next_cell}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{dim}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in next\_cell(c(2, 3, 1), dim = c(2, 3, 2)): could not find function "{}next\_cell"{}}}\end{kframe}
+\end{knitrout}
+
+
+\subsection{\code{next\_cell\_slice()} and \code{slice2entry()}}
+%\label{sec:x}
+
+Given that we look at cells for which for which the index in dimension $2$ is at level $3$ (that is
+\verb|Eye=Hazel|), i.e.\ cells of the form $(j,3,l)$. Given such a
+cell, what is then the next cell that also satisfies this
+constraint. This is provided by
+\rr{next\_cell\_slice()}.\footnote{FIXME: sliceset should be called margin.}
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{next_cell_slice}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{slice_marg}\hlstd{=}\hlnum{2}\hlstd{,} \hlkwc{dim}\hlstd{=}\hlkwd{c}\hlstd{(} \hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2} \hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in next\_cell\_slice(c(1, 3, 1), slice\_marg = 2, dim = c(2, 3, 2)): could not find function "{}next\_cell\_slice"{}}}\begin{alltt}
+\hlkwd{next_cell_slice}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{slice_marg}\hlstd{=}\hlnum{2}\hlstd{,} \hlkwc{dim}\hlstd{=}\hlkwd{c}\hlstd{(} \hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2} \hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in next\_cell\_slice(c(2, 3, 1), slice\_marg = 2, dim = c(2, 3, 2)): could not find function "{}next\_cell\_slice"{}}}\end{kframe}
+\end{knitrout}
+
+
+Given that in dimension $2$ we look at level $3$. We want to find
+entries for the cells of the form $(j,3,l)$.\footnote{FIXME:slicecell and
+  sliceset should be renamed}
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{slice2entry}\hlstd{(}\hlkwc{slice_cell}\hlstd{=}\hlnum{3}\hlstd{,} \hlkwc{slice_marg}\hlstd{=}\hlnum{2}\hlstd{,} \hlkwc{dim}\hlstd{=}\hlkwd{c}\hlstd{(} \hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2} \hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in slice2entry(slice\_cell = 3, slice\_marg = 2, dim = c(2, 3, 2)): could not find function "{}slice2entry"{}}}\end{kframe}
+\end{knitrout}
+
+To verify that we indeed get the right cells:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{r} \hlkwb{<-} \hlkwd{slice2entry}\hlstd{(}\hlkwc{slice_cell}\hlstd{=}\hlnum{3}\hlstd{,} \hlkwc{slice_marg}\hlstd{=}\hlnum{2}\hlstd{,} \hlkwc{dim}\hlstd{=}\hlkwd{c}\hlstd{(} \hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2} \hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in slice2entry(slice\_cell = 3, slice\_marg = 2, dim = c(2, 3, 2)): could not find function "{}slice2entry"{}}}\begin{alltt}
+\hlkwd{lapply}\hlstd{(}\hlkwd{lapply}\hlstd{(r, entry2cell,} \hlkwd{c}\hlstd{(} \hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2} \hlstd{)),}
+       \hlstd{cell2name,} \hlkwd{dimnames}\hlstd{(hec))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): object 'entry2cell' not found}}\end{kframe}
+\end{knitrout}
+
+
+
+
+\subsection{\code{fact\_grid()} -- Factorial grid}
+\label{sec:factgrid}
+
+Using the operations above we can obtain the combinations of the
+factors as a matrix:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{head}\hlstd{(} \hlkwd{fact_grid}\hlstd{(} \hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{,} \hlnum{2}\hlstd{) ),} \hlnum{6} \hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in fact\_grid(c(2, 3, 2)): could not find function "{}fact\_grid"{}}}\end{kframe}
+\end{knitrout}
+
+A similar dataframe can also be obtained with the standard \R\
+function \code{expand.grid} (but \code{factGrid} is faster)
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{head}\hlstd{(} \hlkwd{expand.grid}\hlstd{(}\hlkwd{list}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{2}\hlstd{,} \hlnum{1}\hlopt{:}\hlnum{3}\hlstd{,} \hlnum{1}\hlopt{:}\hlnum{2}\hlstd{)),} \hlnum{6} \hlstd{)}
+\end{alltt}
+\begin{verbatim}
+##   Var1 Var2 Var3
+## 1    1    1    1
+## 2    2    1    1
+## 3    1    2    1
+## 4    2    2    1
+## 5    1    3    1
+## 6    2    3    1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+
+\appendix
+
+\section{More about slicing}
+\label{sec:more-about-slicing}
+
+Slicing using standard \R\ code can be done as follows:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{hec[,} \hlnum{2}\hlopt{:}\hlnum{3}\hlstd{, ]}  \hlopt{%>%} \hlstd{flat}  \hlcom{## A 2 x 2 x 2 array}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in hec[, 2:3, ] \%>\% flat: could not find function "{}\%>\%"{}}}\begin{alltt}
+\hlstd{hec[}\hlnum{1}\hlstd{, ,} \hlnum{1}\hlstd{]}             \hlcom{## A vector}
+\end{alltt}
+\begin{verbatim}
+## Brown  Blue Hazel 
+##    32    11    10
+\end{verbatim}
+\begin{alltt}
+\hlstd{hec[}\hlnum{1}\hlstd{, ,} \hlnum{1}\hlstd{,} \hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{]} \hlcom{## A 1 x 3 x 1 array}
+\end{alltt}
+\begin{verbatim}
+## , , Sex = Male
+## 
+##        Eye
+## Hair    Brown Blue Hazel
+##   Black    32   11    10
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Programmatically we can do the above as
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{do.call}\hlstd{(}\hlstr{"["}\hlstd{,} \hlkwd{c}\hlstd{(}\hlkwd{list}\hlstd{(hec),} \hlkwd{list}\hlstd{(}\hlnum{TRUE}\hlstd{,} \hlnum{2}\hlopt{:}\hlnum{3}\hlstd{,} \hlnum{TRUE}\hlstd{)))}  \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in do.call("{}["{}, c(list(hec), list(TRUE, 2:3, TRUE))) \%>\% flat: could not find function "{}\%>\%"{}}}\begin{alltt}
+\hlkwd{do.call}\hlstd{(}\hlstr{"["}\hlstd{,} \hlkwd{c}\hlstd{(}\hlkwd{list}\hlstd{(hec),} \hlkwd{list}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{TRUE}\hlstd{,} \hlnum{1}\hlstd{)))}
+\hlkwd{do.call}\hlstd{(}\hlstr{"["}\hlstd{,} \hlkwd{c}\hlstd{(}\hlkwd{list}\hlstd{(hec),} \hlkwd{list}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{TRUE}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\grbase\ provides two alterntives for each of these three cases above:
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{tabSlicePrim}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlnum{TRUE}\hlstd{,} \hlnum{2}\hlopt{:}\hlnum{3}\hlstd{,} \hlnum{TRUE}\hlstd{))}  \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlicePrim(hec, slice = list(TRUE, 2:3, TRUE)) \%>\% flat: could not find function "{}\%>\%"{}}}\begin{alltt}
+\hlkwd{tabSlice}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,} \hlnum{3}\hlstd{)),} \hlkwc{margin}\hlstd{=}\hlnum{2}\hlstd{)} \hlopt{%>%} \hlstd{flat}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlice(hec, slice = list(c(2, 3)), margin = 2) \%>\% flat: could not find function "{}\%>\%"{}}}\begin{alltt}
+\hlkwd{tabSlicePrim}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{TRUE}\hlstd{,} \hlnum{1}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlicePrim(hec, slice = list(1, TRUE, 1)): could not find function "{}tabSlicePrim"{}}}\begin{alltt}
+\hlkwd{tabSlice}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{margin}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{3}\hlstd{))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlice(hec, slice = list(1, 1), margin = c(1, 3)): could not find function "{}tabSlice"{}}}\begin{alltt}
+\hlkwd{tabSlicePrim}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{TRUE}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlicePrim(hec, slice = list(1, TRUE, 1), drop = FALSE): could not find function "{}tabSlicePrim"{}}}\begin{alltt}
+\hlkwd{tabSlice}\hlstd{(hec,} \hlkwc{slice}\hlstd{=}\hlkwd{list}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{),} \hlkwc{margin}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{3}\hlstd{),} \hlkwc{drop}\hlstd{=}\hlnum{FALSE}\hlstd{)}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in tabSlice(hec, slice = list(1, 1), margin = c(1, 3), drop = FALSE): could not find function "{}tabSlice"{}}}\end{kframe}
+\end{knitrout}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%
+%%%
+%%% CUTOUT BELOW HERE
+%%%
+%%%
+
+
+% Given $A\subset \Delta$ and a cell $i_A \in I_A$. This cell defines a
+% slice of the original array, namely the cells
+% $I(i_A)=\{j\in I|j_A = i_A\}$.
+% We often want to find the entries in
+% $x$ for the cells $I(i_A)$. This is provided by
+% \code{slice2entry()}. For example, we may want the entries for
+% the cells $(*,1,2,*)$ or $(2,2,*,*)$:
+
+% @
+% <<>>=
+% r1<-slice2entry(slicecell=c(1,2), sliceset=c(2,3), dim2222); r1
+% @ %def
+
+% To verify that we indeed get the right cells:
+
+% @
+% <<>>=
+% do.call(rbind, lapply(r1, entry2cell, dim2222))
+% @ %def
+
+
+
+% \subsection{\code{permuteCellEntries()}}
+
+% %% SOMETHING WRONG WITH THE CODE; BUT WE DONT REALLY NEED IT
+
+% For e.g.\ a $2\times 3 \times 2$ array, the entries $1,2,3, \dots, 12$
+% correspond to the cells
+% $(1,1,1)$,
+% $(2,1,1)$, $(1,2,1)$, $(2,2,1)$,$(1,3,1)$, $\dots, (2,3,2)$. 
+
+% Suppose dimensions are permuted as $(1,2,3) \rightarrow (2,3,1)$. Then
+% the entries become:
+% @ 
+% <<>>=
+% p <- permuteCellEntries(perm=c(2,1,3), dim=c( 2, 3, 2 ))
+% p
+% @ %def 
+
+% @ 
+% <<>>=
+% hec[ p ]
+% @ %def 
+
+
+
+
+% In a $2\times 3$ table, entries $1,\dots,6$ correspond to combinations
+% $(1,1),(2,1),(1,2),(2,2),(1,3),(2,3)$. If we permute the table to a $3
+% \times 2$ table the entries become as follows:
+
+% @
+% <<>>=
+% p<-permuteCellEntries(perm=c(2,1), dim=c(2,3)); p
+% @ %def
+
+% So for example,
+
+% @
+% <<>>=
+% (A <- array(11:16, dim=c(2,3)))
+% Ap <- A[p]
+% dim(Ap) <- c(3,2)
+% Ap
+% @ %def
+
+% This corresponds to
+
+% @
+% <<>>=
+% aperm(A, c(2,1))
+% @ %def
+
+% @
+% <<>>=
+% ff <- factGrid(dim2222)
+% head(ff, 4)
+% tail(ff, 4)
+% @ %def
+
+% This is the same as (but faster)
+
+% @
+% <<>>=
+% aa <- expand.grid(list(1:2,1:2,1:2,1:2))
+% head(aa, 4)
+% @ %def
+
+% There is a slice version as well:
+% @
+% <<>>=
+% factGrid(dim2222, slicecell=c(1,2), sliceset=c(2,3))
+% @ %def
+
+% @ 
+% <<>>=
+% if (require(microbenchmark)){
+%     microbenchmark(as.data.frame(factGrid(c( 2, 3, 2 ))),
+%                    expand.grid(list(1:2, 1:3, 1:2)))
+% }
+% @ %def 
+
+
+
+
+
+
+% As an example we take the following:
+
+% @
+% <<>>=
+% dim2222 <- c(2,2,2,2)
+% dim2323 <- c(2,3,2,3)
+% @ %def
+
+% Given $A\subset \Delta$ and a cell $i_A \in I_A$ consider the cells
+% $I(i_A)=\{j\in I|j_A = i_A\}$. For example, the cells satisfying that
+% dimension $2$ is at level $1$. Given such a cell, say $(2,1,1,2)$ we
+% often want to find the next cell also satisfying this constraint
+% (again following the convention that the first factor varies fastest),
+% that is $(1,1,2,2)$. This is provided by \code{next_cell_slice()}.
+% @
+% <<>>=
+% next_cell_slice(c(2,1,1,2),  sliceset=2, dim2323)
+% next_cell_slice(c(1,3,2,1),  sliceset=c(2,3), dim2323)
+% @ %def
+
+
+
+% Given a cell, say $i=(1,1,2,1)$ we often want to find the next cell in
+% the table following the convention that the first factor varies
+% fastest, that is $(2,1,2,1)$. This is provided by
+% \code{next_cell()}.
+
+% @
+% <<>>=
+% next_cell(c(1,1,2,1), dim2222)
+% next_cell(c(2,2,2,1), dim2222)
+% @ %def
+
+
+% Given $A\subset \Delta$ and a cell $i_A \in I_A$ consider the cells
+% $I(i_A)=\{j\in I|j_A = i_A\}$. For example, the cells satisfying that
+% dimension $2$ is at level $1$. Given such a cell, say $(2,1,1,2)$ we
+% often want to find the next cell also satisfying this constraint
+% (again following the convention that the first factor varies fastest),
+% that is $(1,1,2,2)$. This is provided by \code{next_cell_slice()}.
+% @
+% <<>>=
+% next_cell_slice(c(2,1,1,2),  sliceset=2, dim2323)
+% next_cell_slice(c(1,3,2,1),  sliceset=c(2,3), dim2323)
+% @ %def
+
+
+
+
+% @
+% <<>>=
+% cell2entry(c(1,1,1,1), dim2222)
+% entry2cell(1, dim2222)
+% cell2entry(c(2,1,2,1), dim2222)
+% entry2cell(6, dim2222)
+% @ %def
+
+
+
+
+
+% @
+% <<eval=F,echo=F>>=
+% cell2entry2(c(2,1,2,1), dim)
+% cell2entryR(c(2,1,2,1), dim)
+% @ %def
+
+
+%% @
+%% <<>>=
+%% ## because lizard is a vector we can do
+%% lizard[1:2]
+%% is.array( lizard[1:2] )
+%% ## because lizard is an array we can do
+%% lizard[,1,1]
+%% is.array( lizard[,1,] )
+%% @ %def
+
+
+% @
+% <<>>=
+% data(lizard, package="gRbase")
+% dimnames(lizard)
+% @ %def
+
+% @ 
+% <<>>=
+% lizard[, 1, ]
+% is.array( lizard[, 1, ] )
+% do.call("[", c(list(lizard), list(TRUE, 1, TRUE))) # programmatically
+% tabSlice(lizard, slice=c(1), margin=c(2))          # using gRbase
+% @ %def 
+
+% If the result is a $1$--dimensional array, then dimensions are dropped
+% by default unless one puts \code{drop=FALSE} in the appropriate places:
+% @ 
+% <<results=hide>>=
+% lizard[, 1, 2]
+% is.array( lizard[, 1, 2] )
+% lizard[, 1, 2, drop=FALSE]
+% is.array( lizard[, 1, 2, drop=FALSE] )
+% do.call("[", c(list(lizard), list(TRUE, 1, 2), drop=FALSE))
+% tabSlice(lizard, slice=c(1, 2), margin=c(2, 3), drop=FALSE)
+% @ %def 
+
+
+
+% \subsection{Slice of a table}
+% \label{sec:slice-table}
+
+% A slice of a table is obtained with \code{tabSlice}:
+
+% @
+% <<>>=
+% tabSlice(lizard, slice=list(species="anoli"))
+% tabSlice(lizard, slice=list(species="anoli", diam="<=4")) ## Dims are preserved...
+% @ %def
+
+% @ 
+% <<>>=
+% tabSlice(lizard, slice=list(species=c("anoli","dist"))) # FIXME: This fails.
+% lizard[,,1:2]
+% @ %def 
+
+
+% \section{Operations on tables}
+% \label{sec:operations-tables}
+
+
+% Consider again the \verb'lizard' data In the following we shall denote
+% the dimnames (or variables) by $D$, $H$ and $S$ and we let $(d,h,s)$
+% denote a configuration of these variables. The contingency table above
+% shall be denoted by $T_{DHS}$ and we shall refer to the
+% $(d,h,s)$-entry as $T_{DHS}(d,h,s)$. 
+
+% @
+% <<>>=
+% T.DHS <- lizard
+% @ %def
+
+% \subsection{Collapsing arrays onto marginals}
+% \label{sec:marginal-tables}
+
+% The $DS$--marginal table $T_{DS}$ is defined to be the table with
+% values
+% \begin{displaymath}
+%   T_{DS}(d,s) = \sum_h T_{DHS}(d,h,s)
+% \end{displaymath}
+
+% @
+% <<>>=
+% T.DS <- tabMarg(lizard, ~diam+species); T.DS
+% ## Alternative forms
+% T.DS <- tabMarg(lizard, c("diam","species"))
+% T.DS <- tabMarg(lizard, c(1,3))
+% @ %def
+
+% @
+% <<echo=F,results=hide>>=
+% T.DS <- tableMargin(lizard, ~diam+species); T.DS
+% T.HS <- tableMargin(lizard, ~height+species); T.HS
+% @ %def
+
+
+% @ %def 
+% @ 
+% <<>>=
+% a1 <- 1:12
+% dim(a1) <- c( 2, 3, 2 )
+% dimnames(a1) <- list(a=c("a1","a2"), b=c("b1","b2","b3"), c=c("c1","c2"))
+% a1 %>% flat
+% a2 <- array(1:12, dim=c( 2, 3, 2 ), 
+%             dimnames=list(a=c("a1","a2"), b=c("b1","b2","b3"), c=c("c1","c2")))
+% a2 %>% flat
+
+% dim.names <- list(a=c("a1","a2"), b=c("b1","b2","b3"), c=c("c1","c2"), d=c("d1","d2"))
+% tab(~a:b:c, dim.names, data=1:12) %>% flat
+% ## tab(c("a","b","c"), dim.names, data=1:12) ## same thing
+% tab(~a:b:c, c( 2, 3, 2 ), data=1:12) %>% flatle(row.vars=1)
+% @ %def 
+
+
+%% An alternative is to use 
+%% \code{parray()} from \grbase. For example
+%% @
+%% <<>>=
+%% yn <- c("y","n")
+%% T.AB <- array(c(5,95,1,99), dim=c(2,2), dimnames=list("A"=yn, "B"=yn))
+%% T.AB <- parray(c("A","B"), levels=list(yn, yn), values=c(5,95,1,99))
+%% @ %def
+
+%% Using \code{parray()}, arrays can be normalized in two ways:
+%% Normalization can be over the first variable for \emph{each}
+%% configuration of all other variables or over all configurations. For
+%% example:
+
+%% @
+%% <<print=T>>=
+%% T.AB <- parray(c("A","B"), levels=list(yn, yn), values=c(5,95,1,99),
+%%                normalize="first")
+%% T.AB <- parray(c("A","B"), levels=list(yn, yn), values=c(5,95,1,99),
+%%                normalize="all")
+%% @ %def
+
+% Using \code{tab()}, arrays can be normalized in two ways:
+% Normalization can be over the first variable for \emph{each}
+% configuration of all other variables or over all configurations. For
+% example:
+
+% @ 
+% <<>>=
+% yn <- c("y","n")
+% lev <- list("a"=yn, "b"=yn)
+% tab(~a:b, levels=lev, data=c(5,95,1,99), normalize="first")
+% tab(~a:b, levels=lev, data=c(5,95,1,99), normalize="all")
+% @ %def 
+
+
+
+
+
+% \subsection{Operations on two tables: $+$, $-$, $*$, $/$}
+% \label{sec:oper-two-tabl}
+
+% The product of two tables, e.g. $T_{DS}$ and $T_{HS}$ is defined to be
+% the table $\tilde T_{DHS}$ with entries
+% \begin{displaymath}
+%   \tilde T_{DHS}(d,h,s)= T_{DS}(d,s) T_{HS}(h,s)
+% \end{displaymath}
+
+% In \R:
+% @
+% <<>>=
+% t.ds <- tabMarg(lizard, ~diam:species)
+% t.hs <- tabMarg(lizard, ~height:species)
+% tabMult(t.ds, t.hs) %>% flat
+% @ %def
+
+% %% T.HS <- tabMarg(lizard, ~height+species)
+% %% T.DHS.mult = tabMult( T.DS, T.HS )
+% %% T.DHS.mult %>% flat
+
+
+% %% @
+% %% <<echo=F,results=hide>>=
+% %% microbenchmark::microbenchmark(
+% %%     tabMult__( T.DS, T.HS ), arrayOp( T.DS, T.HS ) )
+% %% @ %def
+
+
+% The quotient, sum and difference is defined similarly:
+% %% @
+% %% <<>>=
+% %% T.DHS.div  = tabDiv( T.DS, T.HS )
+% %% T.DHS.add  = tabAdd( T.DS, T.HS )
+% %% T.DHS.subt = tabSubt( T.DS, T.HS )
+% %% @ %def
+
+
+
+% @ 
+% <<>>=
+% tabDiv(t.ds, t.hs) %>% flat
+% tabAdd(t.ds, t.hs) %>% flat
+% tabSubt(t.ds, t.hs) %>% flat
+% @ %def 
+
+
+%% @
+%% <<>>=
+%% flatle( tablePerm(T.DHS, c("species","height","diam")) )
+%% @ %def
+
+
+% \subsection{Expanding arrays to new dimensions}
+% \label{sec:expanding-arrays-new}
+
+% The ``opposite'' operation is to extend an array. For example, we can
+% extend $T_{DS}$ to have a third dimension, e.g.\ \code{height}. That is
+% \begin{displaymath}
+%   T_{DHS}(d,h,s) = T_{DS}(d,s)
+% \end{displaymath}
+% so $T_{DHS}(d,h,s)$ is constant as a function of $h$. 
+
+% @ 
+% <<>>=
+% tabExtend <- arrayExtendDomain  ## FIXME
+% tabExtend(t.ds, list(height=c(">4.75", "<=4.75"))) %>% flat
+% @ %def 
+
+
+
+% @ 
+% <<>>=
+% tabExpand(t.ds, t.hs) %>% flat
+% @ %def 
+
+
+
+
+% Consider this way of ``blowing up'' an array with extra dimensions.
+% @
+% <<>>=
+% T.HSD2 <- tabExpand(T.DS, T.HS); T.HSD2
+% names(dimnames(T.HSD2))
+% @ %def
+
+% Here \verb'T.HSD2' is a $3$--way table with the same variable names as
+% the union of the variable names in \verb'T.DS' and \verb'T.HS'. Those
+% variables in those variables in \verb'T.HS' vary fastest. Lastly, if
+% we regards \verb'T.HSD2' as a function of $(h,s,d)$ we see that
+% \verb'T.HSD2' is constant as a function of $s$.
+
+
+% \subsection{Cross classified data - contingency tables}
+
+% Arrays appear for example in connection with cross classified data:
+% Consider the \code{lizard} data in \grbase:
+% @
+% <<>>=
+% data( lizard, package="gRbase" )
+% lizard
+% @ %def
+
+% Data is a contingency table; a cross classified table of counts. In
+% \R\ lingo, data is a \code{table} object, but it is also an array because
+% it has a \code{dim} attribute:
+% @ 
+% <<>>=
+% class( lizard )
+% is.array( lizard )
+% dim( lizard )
+% @ %def 
+
+% Alternative views of data are:
+% @ 
+% <<>>=
+% flatle(lizard, row.vars=1)
+% flat <- function(x) flatle(x, row.vars=1)
+% lizard %>% flat # because gRbase imports the pipe %>% from magrittr
+% @ %def 
+
+
+%% @
+%% <<>>=
+%% x0 <- x1 <- x2 <- x3 <- 1:8
+%% c(is.atomic(x0), is.vector(x0), is.matrix(x0), is.array(x0))
+
+%% ## 1-dimensional array
+%% dim(x1) <- 8
+%% x1
+%% c(is.atomic(x1), is.vector(x1), is.matrix(x1), is.array(x1))
+
+%% ## 2-dimensional array (matrix)
+%% dim(x2) <- c(2,4)
+%% x2
+%% c(is.atomic(x2), is.vector(x2), is.matrix(x2), is.array(x2))
+
+%% ## 3-dimensional array
+%% dim(x3) <- c(2,2,2) 
+%% x3
+%% c(is.atomic(x0), is.vector(x0), is.matrix(x0), is.array(x0))
+%% @ %def
+
+%% Notice that arrays do not need a \code{dimnames} attribute. However,
+%% for some of the operations described in the following, \code{dimnames}
+%% are essential. One may set dimnames with
+%% @ 
+%% <<>>=
+%% dimnames(x3) <- list(a=c("a1","a2"), b=c("y","n"), c=c(1,2))
+%% @ %def 
+
+
+
+%% Hence the defining characterstic of an array is that it is a vector
+%% with a dim attribute. For example
+%% @
+%% <<>>=
+%% ## 1-dimensional array
+%% x1 <- 1:8
+%% dim(x1) <- 8
+%% x1
+%% c(is.array(x1), is.matrix(x1))
+
+%% ## 2-dimensional array (matrix)
+%% x2 <- 1:8
+%% dim(x2) <- c(2,4)
+%% x2
+%% c(is.array(x2), is.matrix(x2))
+
+%% ## 3-dimensional array
+%% x3 <- 1:8
+%% dim(x3) <- c(2,2,2)
+%% x3
+%% c(is.array(x3), is.matrix(x3))
+%% @ %def
+
+
+
+%%
+%%Arrays appear for example in connection with cross classified
+%%data. For example
+%%<<>>=
+%%HairEyeColor
+%%@ %def 
+%%
+%%Data is a contingency table; a cross classified table of counts. In
+%%\R\ lingo, data is a \code{table} object, but it is also an array because
+%%it has a \code{dim} attribute:
+%%<<>>=
+%%class( HairEyeColor )
+%%is.array( HairEyeColor )
+%%dim( HairEyeColor )
+%%@ %def 
+%%
+%%The array also has a
+%%\code{dimnames} attribute and the list of \verb'dimnames' has names:
+%%<<>>=
+%%dimnames( HairEyeColor )
+%%@ %def 
+%%
+%%
+%%Notice from the output above that the first variable (\code{Hair})
+%%varies fastest. The \verb'dimnames' attributes are important for many of the functions from
+%%\grbase\ described in the following sections.
+%%
+%%\subsection{Named arrays}
+%%\label{sec:named-arrays}
+%%
+%%An array with named dimnames is in this package called a \emph{named array}; this can be checked with
+%%\rr{is.named.array()}
+%%<<>>=
+%%is.named.array( HairEyeColor )
+%%@ %def 
+%%
+%%
+%%
+%%To limit output we shall only consider two hair colours and three eye colours.
+%%<<>>=
+%%hec <- do.call("[", c(list(HairEyeColor), list(1:2, 1:3, TRUE), drop=FALSE))
+%%hec <- HairEyeColor[1:2, 1:3, ]
+%%hec
+%%@ %def 
+%%
+%%A more compact view of data can be achieved with \code{ftable()}.
+%%Since \grbase\ imports the pipe operator \verb'%>%' from
+%%the \pkg{magrittr} package we will in this note do:
+%%<<>>=
+%%flat <- function(x) {ftable(x, row.vars=1)}
+%%hec %>% flat
+%%@ %def 
+%%
+
+%% Arrays can be defined in different ways using standard \R\ code:
+%% <<>>=
+%% z1 <- c(32, 53, 11, 50, 10, 25, 36, 66, 9, 34, 5, 29)
+%% di <- c(2, 3, 2)
+%% dn <- list(Hair = c("Black", "Brown"), 
+%%            Eye = c("Brown", "Blue", "Hazel"), 
+%%            Sex = c("Male", "Female"))
+%% dim(z1) <- di
+%% dimnames(z1) <- dn
+%% z2 <- array(c(32, 53, 11, 50, 10, 25, 36, 66, 9, 34, 5, 29),
+%%             dim=di, dimnames=dn)
+%% @ %def 
+%% where the \code{dimnames} part in both cases is optional. 
