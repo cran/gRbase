@@ -1,3 +1,20 @@
+
+.check.is.matrix <- function(x){
+    if (!inherits(x, c("matrix", "dgCMatrix")))
+        stop("Input must be a matrix or a dgCMatrix\n")
+}
+
+
+.check.is.igraph <- function(x){
+    if (!inherits(x, "igraph"))
+        stop("'x' not an igraph object...")    
+}
+
+.is_list_of_atomic <- function(z){
+    is.list(z) && all(sapply(z, is.atomic))            
+}
+
+
 ## ###################################################################
 ##
 #' @title gRbase utilities
@@ -187,9 +204,52 @@ lapplyV2I <- function(setlist, item){lapply(setlist, function(elt) match(elt, it
 lapplyI2V <- function (setlist, item) {lapply(setlist, function(elt) item[elt])}
 
 
+
+
+#' @aliases pairs2num
+#' @export
+pairs2num <- function(x, vn, sort=TRUE){
+    if (!inherits(x, "matrix")){
+        if (is.null(x))
+            return(NULL)
+        
+        if (inherits(x,"list"))
+            x <- do.call(rbind,x)
+        else {
+            if (inherits(x,"character"))
+                x <- matrix(x,nrow=1)
+        }
+    }
+    ## From here x should be a p x 2 matrix
+    
+    dd <- dim(x)
+    if (dd[1L] == 0){
+        return(numeric(0))
+    } else {
+        if (sort){
+            i     <- x[, 2L]< x[, 1L]
+            c1    <- i+1L
+            c2    <- -1L * (i - 1L) + 1L
+            x  <- cbind(
+                x[cbind(seq_along(c1), c1)],
+                x[cbind(seq_along(c2), c2)])
+        }
+        ans       <- match(x, vn)
+        dim(ans)  <- dim(x)
+        colSums(t.default(ans) * c(100000, 1))
+    }
+}
+
+
+
+
+
+
+
 ## Codes a p x 2 matrix of characters or a list with pairs
 ## of characters into a vector of numbers.
 ## FIXME: pairs2num: Cpp implementation
+
 
 ## #' @export
 ## pairs2num <- function(x, vn, sort=TRUE){
@@ -236,45 +296,3 @@ lapplyI2V <- function (setlist, item) {lapply(setlist, function(elt) item[elt])}
 ## of characters into a vector of numbers.
 
 ## FIXME: pairs2num: Cpp implementation
-
-#' @aliases pairs2num
-#' @export
-pairs2num <- function(x, vn, sort=TRUE){
-    if (!inherits(x, "matrix")){
-        if (is.null(x))
-            return(NULL)
-        
-        if (inherits(x,"list"))
-            x <- do.call(rbind,x)
-        else {
-            if (inherits(x,"character"))
-                x <- matrix(x,nrow=1)
-        }
-    }
-    ## From here x should be a p x 2 matrix
-    
-    dd <- dim(x)
-    if (dd[1L] == 0){
-        return(numeric(0))
-    } else {
-        if (sort){
-            i     <- x[, 2L]< x[, 1L]
-            c1    <- i+1L
-            c2    <- -1L * (i - 1L) + 1L
-            x  <- cbind(
-                x[cbind(seq_along(c1), c1)],
-                x[cbind(seq_along(c2), c2)])
-        }
-        ans       <- match(x, vn)
-        dim(ans)  <- dim(x)
-        colSumsPrim(t.default(ans) * c(100000, 1))
-        ## ans[,1L] <- ans[,1L] * 100000L
-        ##       rowSumsPrim(ans)
-    }
-}
-
-
-
-
-
-

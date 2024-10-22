@@ -87,7 +87,7 @@ hec %a_% ~Hair:Eye
 
 ## -------------------------------------------------------------------------------------------------
 he1 <- tabMarg(hec, c("Hair", "Eye"))
-he2 <- tabMarg(he1, c("Hair", "Eye"))
+he2 <- tabMarg(he1, c("Eye", "Hair"))
 tabEqual(he1, he2)
 
 ## -------------------------------------------------------------------------------------------------
@@ -150,6 +150,10 @@ es <- tabMarg(hec, ~Eye:Sex)
 tabSum(he, hs, es)  
 ## tabSum(list(he, hs, es))
 
+## ----results=chk----------------------------------------------------------------------------------
+tabListAdd(list(he, hs, es))
+tabListMult(list(he, hs, es))
+
 ## -------------------------------------------------------------------------------------------------
 tabDist(hec, marg=~Hair:Eye)
 tabDist(hec, cond=~Sex) 
@@ -197,9 +201,10 @@ myips <- function(indata, glist){
     fit[] <-  1
     ## List of sufficient marginal tables
     md    <- lapply(glist, function(g) tabMarg(indata, g))
-
-    for (i in 1:4){
-        for (j in seq_along(glist)){
+    n_iter <- 4
+    n_generators <- length(glist)
+    for (i in 1:n_iter){
+        for (j in 1:n_generators){
             mf  <- tabMarg(fit, glist[[j]])
             # adj <- tabDiv( md[[ j ]], mf)
             # fit <- tabMult( fit, adj )
@@ -228,8 +233,10 @@ c(hec)
 
 ## -------------------------------------------------------------------------------------------------
 cell2name <- function(cell, dimnames){
-    unlist(lapply(1:length(cell), function(m) dimnames[[m]][cell[m]]))
-}
+    unlist(lapply(1:length(cell),
+                  function(m){
+                      dimnames[[m]][cell[m]]
+                  }))}
 cell2name(c(2,3,1), dimnames(hec))
 
 ## -------------------------------------------------------------------------------------------------
